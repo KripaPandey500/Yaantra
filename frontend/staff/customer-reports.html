@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yaantra | Customer Reports</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#062621',
+                        'primary-light': '#0a362f',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f0f2f1; }
+        .label-style { font-size: 10px; font-weight: 800; text-transform: uppercase; color: #062621; letter-spacing: 0.05em; margin-bottom: 0.5rem; display: block; }
+
+        /* Report Card hover */
+        .report-card { transition: all 0.25s ease; cursor: pointer; }
+        .report-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(6,38,33,0.12); }
+        .report-card.active-card { border-color: #062621 !important; background: #062621; color: white; }
+        .report-card.active-card p, .report-card.active-card h3, .report-card.active-card span { color: white !important; }
+        .report-card.active-card .card-icon { background: rgba(255,255,255,0.15) !important; color: white !important; }
+
+        /* Table */
+        .data-table th { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #9ca3af; padding: 1rem 1.5rem; background: #f9fafb; }
+        .data-table td { padding: 1rem 1.5rem; font-size: 0.8125rem; border-bottom: 1px solid #f3f4f6; }
+        .data-table tr:last-child td { border-bottom: none; }
+        .data-table tr:hover td { background: #f9fafb; }
+
+        /* Badge */
+        .badge-green  { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+        .badge-yellow { background: #fefce8; color: #854d0e; border: 1px solid #fef08a; }
+        .badge-red    { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+        .badge-blue   { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+
+        /* Print */
+        @media print {
+            #sidebar-placeholder, header, .no-print { display: none !important; }
+            main { margin-left: 0 !important; }
+            body { background: white; }
+            .print-page { box-shadow: none !important; border: none !important; }
+        }
+
+        /* Skeleton loader */
+        .skeleton { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    </style>
+</head>
+<body class="flex min-h-screen">
+
+    <div id="sidebar-placeholder"></div>
+
+    <main class="ml-64 flex-1">
+
+        <!-- Header -->
+        <header class="bg-white/80 backdrop-blur-md p-6 flex justify-between items-center shadow-sm sticky top-0 z-10 border-b border-gray-100 no-print">
+            <div>
+                <h2 class="text-2xl font-bold text-primary">Customer Reports</h2>
+                <p class="text-xs text-gray-400">Generate and export customer analytics.</p>
+            </div>
+            <div class="flex items-center gap-4">
+                <!-- Export Buttons -->
+
+                 <button onclick="saveReport()" class="flex items-center gap-2 border border-emerald-600 text-emerald-600 text-[10px] font-bold px-5 py-2.5 rounded-full hover:bg-emerald-600 hover:text-white transition-all">
+    <i data-lucide="save" class="w-3.5 h-3.5"></i> Save Report
+</button>
+                <button onclick="exportCSV()" class="flex items-center gap-2 border border-primary text-primary text-[10px] font-bold px-5 py-2.5 rounded-full hover:bg-primary hover:text-white transition-all">
+                    <i data-lucide="download" class="w-3.5 h-3.5"></i> Export CSV
+                </button>
+                <button onclick="window.print()" class="flex items-center gap-2 bg-primary text-white text-[10px] font-bold px-5 py-2.5 rounded-full hover:bg-primary-light transition-all">
+                    <i data-lucide="printer" class="w-3.5 h-3.5"></i> Print Report
+                </button>
+                <div class="flex items-center gap-3 border-l pl-4">
+                    <p class="text-sm font-bold text-primary" id="userName">Loading...</p>
+                    <img id="userProfilePic" src="https://ui-avatars.com/api/?name=Staff" class="w-10 h-10 rounded-full border border-gray-200 object-cover">
+                </div>
+            </div>
+        </header>
+
+        <section class="p-10 space-y-8">
+
+            <!-- Summary Stats -->
+            <div class="grid grid-cols-4 gap-5 no-print">
+                <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+                    <p class="label-style">Total Customers</p>
+                    <h3 class="text-3xl font-bold text-primary" id="sum-total">—</h3>
+                </div>
+                <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+                    <p class="label-style">Total Revenue</p>
+                    <h3 class="text-3xl font-bold text-emerald-600" id="sum-revenue">—</h3>
+                </div>
+                <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+                    <p class="label-style">High Spenders</p>
+                    <h3 class="text-3xl font-bold text-primary" id="sum-highspend">—</h3>
+                </div>
+                <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+                    <p class="label-style">Pending Credits</p>
+                    <h3 class="text-3xl font-bold text-amber-500" id="sum-pending">—</h3>
+                </div>
+            </div>
+
+            <!-- Report Type Selector -->
+            <div class="no-print">
+                <p class="label-style mb-4">Select Report Type</p>
+                <div class="grid grid-cols-3 gap-5">
+
+                    <div class="report-card active-card bg-white border-2 border-gray-100 rounded-2xl p-6" onclick="selectReport('all')">
+                        <div class="card-icon w-10 h-10 rounded-xl bg-primary/5 text-primary flex items-center justify-center mb-4">
+                            <i data-lucide="users" class="w-5 h-5"></i>
+                        </div>
+                        <h3 class="font-bold text-sm text-primary">All Customers</h3>
+                        <p class="text-[11px] text-gray-400 mt-1">Complete customer registry with vehicles and spend data.</p>
+                    </div>
+
+                    <div class="report-card bg-white border-2 border-gray-100 rounded-2xl p-6" onclick="selectReport('regulars')">
+                        <div class="card-icon w-10 h-10 rounded-xl bg-primary/5 text-primary flex items-center justify-center mb-4">
+                            <i data-lucide="repeat" class="w-5 h-5"></i>
+                        </div>
+                        <h3 class="font-bold text-sm text-primary">Regular Customers</h3>
+                        <p class="text-[11px] text-gray-400 mt-1">Customers with 2 or more completed orders.</p>
+                    </div>
+
+                    <div class="report-card bg-white border-2 border-gray-100 rounded-2xl p-6" onclick="selectReport('highspenders')">
+                        <div class="card-icon w-10 h-10 rounded-xl bg-primary/5 text-primary flex items-center justify-center mb-4">
+                            <i data-lucide="trending-up" class="w-5 h-5"></i>
+                        </div>
+                        <h3 class="font-bold text-sm text-primary">High Spenders</h3>
+                        <p class="text-[11px] text-gray-400 mt-1">Customers who have spent over Rs. 5,000 total.</p>
+                    </div>
+
+                    <div class="report-card bg-white border-2 border-gray-100 rounded-2xl p-6" onclick="selectReport('pending')">
+                        <div class="card-icon w-10 h-10 rounded-xl bg-primary/5 text-primary flex items-center justify-center mb-4">
+                            <i data-lucide="clock" class="w-5 h-5"></i>
+                        </div>
+                        <h3 class="font-bold text-sm text-primary">Pending Credits</h3>
+                        <p class="text-[11px] text-gray-400 mt-1">Customers with unpaid or pending orders.</p>
+                    </div>
+
+                    <div class="report-card bg-white border-2 border-gray-100 rounded-2xl p-6" onclick="selectReport('novehicle')">
+                        <div class="card-icon w-10 h-10 rounded-xl bg-primary/5 text-primary flex items-center justify-center mb-4">
+                            <i data-lucide="car-front" class="w-5 h-5"></i>
+                        </div>
+                        <h3 class="font-bold text-sm text-primary">No Vehicle Registered</h3>
+                        <p class="text-[11px] text-gray-400 mt-1">Customers without any registered vehicle.</p>
+                    </div>
+
+                    <div class="report-card bg-white border-2 border-gray-100 rounded-2xl p-6" onclick="selectReport('inactive')">
+                        <div class="card-icon w-10 h-10 rounded-xl bg-primary/5 text-primary flex items-center justify-center mb-4">
+                            <i data-lucide="user-x" class="w-5 h-5"></i>
+                        </div>
+                        <h3 class="font-bold text-sm text-primary">Inactive Customers</h3>
+                        <p class="text-[11px] text-gray-400 mt-1">Customers with zero orders placed.</p>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Report Output -->
+            <div class="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden print-page">
+
+                <!-- Report Header (visible in print) -->
+                <div class="hidden print:block p-8 border-b border-gray-100">
+                    <h1 class="text-2xl font-bold text-primary">YAANTRA — Customer Report</h1>
+                    <p class="text-xs text-gray-400 mt-1">Generated: <span id="print-date"></span></p>
+                </div>
+
+                <div class="p-8 border-b border-gray-50 flex justify-between items-center">
+                    <div>
+                        <h3 class="font-bold text-primary" id="report-title">All Customers</h3>
+                        <p class="text-xs text-gray-400 mt-0.5" id="report-subtitle">Showing complete customer registry</p>
+                    </div>
+                    <div class="flex items-center gap-3 no-print">
+                        <div class="relative">
+                            <i data-lucide="search" class="absolute left-3 top-2.5 w-3.5 h-3.5 text-gray-400"></i>
+                            <input type="text" id="reportSearch" placeholder="Filter results..."
+                                oninput="filterReportTable()"
+                                class="pl-9 pr-4 py-2 border border-gray-200 rounded-full text-xs outline-none focus:border-primary w-48">
+                        </div>
+                        <span id="report-count" class="text-xs text-gray-400 font-semibold bg-gray-100 px-3 py-1.5 rounded-full"></span>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="overflow-x-auto">
+                    <table class="w-full data-table" id="reportTable">
+                        <thead>
+                            <tr id="reportTableHead">
+                                <th class="text-left">Customer</th>
+                                <th class="text-left">Email</th>
+                                <th class="text-left">Phone</th>
+                                <th class="text-left">Vehicles</th>
+                                <th class="text-left">Orders</th>
+                                <th class="text-left">Total Spent</th>
+                                <th class="text-left">Payment Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reportTableBody">
+                            <tr><td colspan="7" class="py-20 text-center text-gray-400 italic">Loading report data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- Saved Reports -->
+<div class="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden no-print">
+    <div class="p-8 border-b border-gray-50 flex justify-between items-center">
+        <div>
+            <h3 class="font-bold text-primary">Saved Reports</h3>
+            <p class="text-xs text-gray-400 mt-0.5">Previously generated and saved reports</p>
+        </div>
+        <button onclick="loadSavedReports()" class="text-xs text-primary font-bold hover:underline flex items-center gap-1">
+            <i data-lucide="refresh-cw" class="w-3 h-3"></i> Refresh
+        </button>
+    </div>
+    <div id="savedReportsBody">
+        <div class="p-8 text-center text-gray-400 italic text-sm">Loading saved reports...</div>
+    </div>
+</div>
+
+        </section>
+    </main>
+
+    <script src="js/staff.js"></script>
+    <script>
+        // ─── DEBUG: Check localStorage and token ───
+        window.debugAuth = function() {
+            console.clear();
+            console.log("=== AUTH DEBUG ===");
+            const token = localStorage.getItem('token');
+            const email = localStorage.getItem('userEmail');
+            const role = localStorage.getItem('userRole');
+            console.log("Token exists:", !!token);
+            console.log("Token preview:", token ? token.substring(0, 50) + "..." : "NO TOKEN");
+            console.log("Email:", email);
+            console.log("Role:", role);
+            console.log("Cached Name:", `${localStorage.getItem('firstName')} ${localStorage.getItem('lastName')}`);
+        };
+        
+        // Call debug on load
+        debugAuth();
+        
+        let allCustomers = [];
+        let allOrders    = [];
+        let currentReport = 'all';
+        let reportData   = [];
+
+        // ─── INIT ───
+        document.addEventListener("DOMContentLoaded", async () => {
+            document.getElementById("print-date").textContent = new Date().toLocaleString();
+            includeSidebar();
+            loadStaffProfile();
+            await loadAllData();
+            renderReport('all');
+            loadSavedReports();
+        });
+        // ─── SAVE REPORT ───
+async function saveReport() {
+    if (!reportData.length) { alert("No data to save."); return; }
+
+    const token = localStorage.getItem("token");
+    const title = document.getElementById("report-title").textContent;
+
+    // Store report rows as JSON in Description
+    const rows = reportData.map(c => ({
+        name:       `${c.firstName || c.FirstName} ${c.lastName || c.LastName}`.trim(),
+        email:      c.email || c.Email,
+        phone:      c.phone || c.Phone || '—',
+        vehicles:   (c.vehicles || c.Vehicles || []).length,
+        orders:     c._orders.length,
+        totalSpent: c._totalSpent,
+        status:     c._orders.length === 0 ? 'No Orders' : (c._hasPending ? 'Pending' : 'Paid')
+    }));
+
+    const payload = {
+        title:       `${title} — ${new Date().toLocaleDateString('en-IN')}`,
+        description: JSON.stringify(rows)
+    };
+
+    try {
+        const res = await fetch(`${BASE_URL}/api/reports`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+            alert("✓ Report saved successfully!");
+            loadSavedReports();
+        } else {
+            alert("Failed to save report.");
+        }
+    } catch (e) {
+        console.error("Save report error:", e);
+        alert("Server error.");
+    }
+}
+
+// ─── LOAD SAVED REPORTS ───
+async function loadSavedReports() {
+    const token = localStorage.getItem("token");
+    const container = document.getElementById("savedReportsBody");
+
+    try {
+        const res = await fetch(`${BASE_URL}/api/reports`, {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+        const reports = await res.json();
+
+        if (!reports.length) {
+            container.innerHTML = `<div class="p-8 text-center text-gray-400 italic text-sm">No saved reports yet.</div>`;
+            return;
+        }
+
+        container.innerHTML = `
+            <table class="w-full data-table">
+                <thead>
+                    <tr>
+                        <th class="text-left">Report Title</th>
+                        <th class="text-left">Generated On</th>
+                        <th class="text-left">Records</th>
+                        <th class="text-left">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${reports.map(r => {
+                        const rows = (() => { try { return JSON.parse(r.description || '[]'); } catch { return []; } })();
+                        return `
+                        <tr>
+                            <td class="font-bold text-primary">${r.title}</td>
+                            <td class="text-gray-500">${new Date(r.createdAt).toLocaleString('en-IN')}</td>
+                            <td><span class="bg-primary/5 text-primary text-[10px] font-bold px-2.5 py-1 rounded-full">${rows.length} records</span></td>
+                            <td>
+                                <div class="flex gap-2">
+                                    <button onclick="viewSavedReport(${r.id})" class="text-xs font-bold text-primary hover:underline flex items-center gap-1">
+                                        <i data-lucide="eye" class="w-3 h-3"></i> View
+                                    </button>
+                                    <button onclick="deleteSavedReport(${r.id})" class="text-xs font-bold text-red-500 hover:underline flex items-center gap-1">
+                                        <i data-lucide="trash-2" class="w-3 h-3"></i> Delete
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>`;
+                    }).join('')}
+                </tbody>
+            </table>`;
+        if (window.lucide) lucide.createIcons();
+
+    } catch (e) {
+        container.innerHTML = `<div class="p-8 text-center text-red-400">Failed to load saved reports.</div>`;
+    }
+}
+
+// ─── VIEW SAVED REPORT ───
+async function viewSavedReport(id) {
+    const token = localStorage.getItem("token");
+    try {
+        const res = await fetch(`${BASE_URL}/api/reports`, {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+        const reports = await res.json();
+        
+        // Fix: compare as Number
+        const report = reports.find(r => Number(r.id) === Number(id));
+        if (!report) { alert("Report not found."); return; }
+
+        const rows = JSON.parse(report.description || '[]');
+
+        document.getElementById("report-title").textContent    = report.title;
+        document.getElementById("report-subtitle").textContent = `Saved on ${new Date(report.createdAt).toLocaleDateString('en-IN')}`;
+        document.getElementById("report-count").textContent    = `${rows.length} records`;
+        document.getElementById("reportSearch").value = '';
+
+        document.getElementById("reportTableBody").innerHTML = rows.length === 0
+            ? `<tr><td colspan="7" class="py-20 text-center text-gray-400 italic">No records in this report.</td></tr>`
+            : rows.map(r => `
+                <tr data-search="${(r.name||'').toLowerCase()} ${(r.email||'').toLowerCase()}">
+                    <td>
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                                ${(r.name||'?').split(' ').map(n => n[0]||'').join('').toUpperCase().slice(0,2)}
+                            </div>
+                            <p class="font-bold text-primary text-sm">${r.name || '—'}</p>
+                        </div>
+                    </td>
+                    <td class="text-gray-500">${r.email || '—'}</td>
+                    <td class="text-gray-500">${r.phone || '—'}</td>
+                    <td class="text-center">
+                        <span class="bg-primary/5 text-primary text-[10px] font-bold px-2.5 py-1 rounded-full">
+                            ${r.vehicles} vehicle${r.vehicles !== 1 ? 's' : ''}
+                        </span>
+                    </td>
+                    <td class="text-center font-bold text-primary">${r.orders}</td>
+                    <td class="${Number(r.totalSpent) > 0 ? 'text-emerald-600 font-bold' : 'text-gray-500'}">
+                        Rs. ${Number(r.totalSpent).toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}
+                    </td>
+                    <td>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                            r.status === 'Paid'    ? 'badge-green'  :
+                            r.status === 'Pending' ? 'badge-yellow' : 'badge-blue'
+                        }">${r.status}</span>
+                    </td>
+                </tr>`).join('');
+
+        if (window.lucide) lucide.createIcons();
+
+        // Scroll to the report table smoothly
+        document.getElementById("reportTable").scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    } catch(e) {
+        console.error("viewSavedReport error:", e);
+        alert("Failed to load report.");
+    }
+}
+    // Re-fetch and show inline
+    const token = localStorage.getItem("token");
+    fetch(`${BASE_URL}/api/reports`, { headers: { "Authorization": `Bearer ${token}` } })
+        .then(r => r.json())
+        .then(reports => {
+            const report = reports.find(r => r.id === id);
+            if (!report) return;
+            const rows = JSON.parse(report.description || '[]');
+
+            document.getElementById("report-title").textContent    = report.title;
+            document.getElementById("report-subtitle").textContent = `Saved on ${new Date(report.createdAt).toLocaleDateString('en-IN')}`;
+            document.getElementById("report-count").textContent    = `${rows.length} records`;
+
+            document.getElementById("reportTableBody").innerHTML = rows.map((r, i) => `
+                <tr data-search="${r.name.toLowerCase()} ${r.email.toLowerCase()}">
+                    <td>
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                                ${r.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2)}
+                            </div>
+                            <p class="font-bold text-primary text-sm">${r.name}</p>
+                        </div>
+                    </td>
+                    <td class="text-gray-500">${r.email}</td>
+                    <td class="text-gray-500">${r.phone}</td>
+                    <td class="text-center"><span class="bg-primary/5 text-primary text-[10px] font-bold px-2.5 py-1 rounded-full">${r.vehicles} vehicles</span></td>
+                    <td class="text-center font-bold text-primary">${r.orders}</td>
+                    <td class="${r.totalSpent > 0 ? 'text-emerald-600 font-bold' : 'text-gray-500'}">
+                        Rs. ${Number(r.totalSpent).toLocaleString('en-IN', {minimumFractionDigits:2})}
+                    </td>
+                    <td>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                            r.status === 'Paid' ? 'badge-green' :
+                            r.status === 'Pending' ? 'badge-yellow' : 'badge-blue'
+                        }">${r.status}</span>
+                    </td>
+                </tr>`).join('');
+
+            if (window.lucide) lucide.createIcons();
+            // Scroll to table
+            document.getElementById("reportTable").scrollIntoView({ behavior: 'smooth' });
+        });
+
+// ─── DELETE SAVED REPORT ───
+async function deleteSavedReport(id) {
+    if (!confirm("Delete this saved report?")) return;
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${BASE_URL}/api/reports/${id}`, {
+        method: 'DELETE',
+        headers: { "Authorization": `Bearer ${token}` }
+    });
+    if (res.ok) loadSavedReports();
+    else alert("Delete failed.");
+}
+
+        // ─── LOAD DATA ───
+async function loadAllData() {
+    const token = localStorage.getItem("token");
+    const headers = { "Authorization": `Bearer ${token}` };
+
+    try {
+        const [custRes, ordRes] = await Promise.all([
+            fetch(`${BASE_URL}/api/auth/customers`, { headers }),
+            fetch(`${BASE_URL}/api/orders`, { headers })
+        ]);
+
+        allCustomers = await custRes.json();
+        allOrders    = ordRes.ok ? await ordRes.json() : [];
+
+        // Attach order data — force Number() comparison to avoid "26" !== 26
+        allCustomers = allCustomers.map(c => {
+            const custId = Number(c.id || c.Id);
+            const orders = allOrders.filter(o => Number(o.userId || o.UserId) === custId);
+            const totalSpent = orders.reduce((s, o) => s + (o.grandTotal || o.GrandTotal || 0), 0);
+            const hasPending = orders.some(o => {
+                const ps = (o.paymentStatus || o.PaymentStatus || '').toLowerCase();
+                return ps === 'unpaid' || ps === 'pending';
+            });
+            const hasConfirmed = orders.some(o => {
+                const st = (o.status || o.Status || '').toLowerCase();
+                return st === 'confirmed' || st === 'completed' || st === 'delivered';
+            });
+            return { ...c, _orders: orders, _totalSpent: totalSpent, _hasPending: hasPending, _hasConfirmed: hasConfirmed };
+        });
+
+        // Summary stats
+        const totalRev   = allCustomers.reduce((s, c) => s + c._totalSpent, 0);
+        const highSpend  = allCustomers.filter(c => c._totalSpent >= 5000).length;
+        const pendingCnt = allCustomers.filter(c => c._hasPending).length;
+
+        document.getElementById("sum-total").textContent     = allCustomers.length;
+        document.getElementById("sum-revenue").textContent   = `Rs. ${totalRev.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+        document.getElementById("sum-highspend").textContent = highSpend;
+        document.getElementById("sum-pending").textContent   = pendingCnt;
+
+        // Render default report
+        renderReport(currentReport);
+
+    } catch (e) {
+        console.error("Data load error:", e);
+    }
+}
+
+        // ─── REPORT SELECTOR ───
+        function selectReport(type) {
+            currentReport = type;
+            document.querySelectorAll('.report-card').forEach(c => c.classList.remove('active-card'));
+            event.currentTarget.classList.add('active-card');
+            renderReport(type);
+        }
+
+        // ─── RENDER REPORT ───
+        function renderReport(type) {
+            const tbody = document.getElementById("reportTableBody");
+            const title = document.getElementById("report-title");
+            const subtitle = document.getElementById("report-subtitle");
+            const countBadge = document.getElementById("report-count");
+            document.getElementById("reportSearch").value = '';
+
+            let filtered = [];
+            switch (type) {
+                case 'all':
+                    filtered = [...allCustomers];
+                    title.textContent = "All Customers";
+                    subtitle.textContent = "Complete customer registry";
+                    break;
+case 'regulars':
+    // Changed to 1+ orders with a confirmed/completed status
+    filtered = allCustomers.filter(c => c._orders.length >= 1 && c._hasConfirmed);
+    title.textContent = "Regular Customers";
+    subtitle.textContent = "Customers with confirmed or completed orders";
+    break;
+
+                case 'highspenders':
+                    filtered = allCustomers.filter(c => c._totalSpent >= 5000).sort((a,b) => b._totalSpent - a._totalSpent);
+                    title.textContent = "High Spenders";
+                    subtitle.textContent = "Customers who spent Rs. 5,000 or more";
+                    break;
+                case 'pending':
+                    filtered = allCustomers.filter(c => c._hasPending);
+                    title.textContent = "Pending Credits";
+                    subtitle.textContent = "Customers with unpaid orders";
+                    break;
+case 'novehicle':
+    filtered = allCustomers.filter(c => {
+        const vehicles = c.vehicles || c.Vehicles || [];
+        return vehicles.length === 0;
+    });
+    title.textContent = "No Vehicle Registered";
+    subtitle.textContent = "Customers without any registered vehicle";
+    break;
+                case 'inactive':
+                    filtered = allCustomers.filter(c => c._orders.length === 0);
+                    title.textContent = "Inactive Customers";
+                    subtitle.textContent = "Customers with zero orders";
+                    break;
+            }
+
+            reportData = filtered;
+            countBadge.textContent = `${filtered.length} record${filtered.length !== 1 ? 's' : ''}`;
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="py-20 text-center text-gray-400 italic text-sm">No records found for this report.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map((c, i) => {
+                const name  = `${c.firstName || c.FirstName || ''} ${c.lastName || c.LastName || ''}`.trim();
+                const email = c.email || c.Email || '—';
+                const phone = c.phone || c.Phone || '—';
+                const vCount = (c.vehicles || c.Vehicles || []).length;
+                const orderCount = c._orders.length;
+                const spent = c._totalSpent;
+
+                // Payment status badge
+                let statusBadge = `<span class="badge-blue text-[10px] font-bold px-2 py-0.5 rounded-full">No Orders</span>`;
+                if (orderCount > 0) {
+                    if (c._hasPending) {
+                        statusBadge = `<span class="badge-yellow text-[10px] font-bold px-2 py-0.5 rounded-full">Pending</span>`;
+                    } else {
+                        statusBadge = `<span class="badge-green text-[10px] font-bold px-2 py-0.5 rounded-full">Paid</span>`;
+                    }
+                }
+
+                // Spend badge
+                let spendColor = 'text-gray-600';
+                if (spent >= 5000) spendColor = 'text-emerald-600 font-extrabold';
+                else if (spent > 0) spendColor = 'text-emerald-500 font-bold';
+
+                const pic = c.profilePicture || c.ProfilePicture;
+                const picUrl = pic
+                    ? `${BASE_URL}${pic}`
+                    : `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=062621&color=fff`;
+
+                return `
+                <tr class="transition-all" data-search="${name.toLowerCase()} ${email.toLowerCase()} ${phone}">
+                    <td>
+                        <div class="flex items-center gap-3">
+                            <img src="${picUrl}" class="w-9 h-9 rounded-full object-cover border border-gray-100 flex-shrink-0"
+                                 onerror="this.src='https://ui-avatars.com/api/?name=User&background=062621&color=fff'">
+                            <div>
+                                <p class="font-bold text-primary text-sm">${name}</p>
+                                <p class="text-[10px] text-gray-400">#CUS-${c.id || c.Id}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="text-gray-500">${email}</td>
+                    <td class="text-gray-500">${phone}</td>
+                    <td class="text-center">
+                        <span class="bg-primary/5 text-primary text-[10px] font-bold px-2.5 py-1 rounded-full">
+                            ${vCount} vehicle${vCount !== 1 ? 's' : ''}
+                        </span>
+                    </td>
+                    <td class="text-center font-bold text-primary">${orderCount}</td>
+                    <td class="${spendColor}">
+                        Rs. ${spent.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}
+                    </td>
+                    <td>${statusBadge}</td>
+                </tr>`;
+            }).join('');
+
+            if (window.lucide) lucide.createIcons();
+        }
+
+        // ─── FILTER TABLE ───
+        function filterReportTable() {
+            const q = document.getElementById("reportSearch").value.toLowerCase();
+            document.querySelectorAll("#reportTableBody tr[data-search]").forEach(row => {
+                row.style.display = row.dataset.search.includes(q) ? '' : 'none';
+            });
+        }
+
+        // ─── EXPORT CSV ───
+        function exportCSV() {
+            if (!reportData.length) { alert("No data to export."); return; }
+
+            const reportTitle = document.getElementById("report-title").textContent;
+            const headers = ["Name", "Email", "Phone", "Vehicles", "Orders", "Total Spent (Rs.)", "Payment Status"];
+
+            const rows = reportData.map(c => {
+                const name     = `${c.firstName || c.FirstName || ''} ${c.lastName || c.LastName || ''}`.trim();
+                const email    = c.email || c.Email || '';
+                const phone    = c.phone || c.Phone || '';
+                const vCount   = (c.vehicles || c.Vehicles || []).length;
+                const orders   = c._orders.length;
+                const spent    = c._totalSpent.toFixed(2);
+                const status   = orders === 0 ? 'No Orders' : (c._hasPending ? 'Pending' : 'Paid');
+                return [name, email, phone, vCount, orders, spent, status].map(v => `"${v}"`).join(',');
+            });
+
+            const csv = [
+                `"YAANTRA Customer Report — ${reportTitle}"`,
+                `"Generated: ${new Date().toLocaleString()}"`,
+                '',
+                headers.map(h => `"${h}"`).join(','),
+                ...rows
+            ].join('\n');
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url  = URL.createObjectURL(blob);
+            const a    = document.createElement('a');
+            a.href     = url;
+            a.download = `yaantra-report-${currentReport}-${Date.now()}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+    </script>
+    <script>lucide.createIcons();</script>
+</body>
+</html>

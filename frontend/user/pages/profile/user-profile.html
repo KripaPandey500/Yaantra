@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en" class="min-h-screen bg-[#f8faf9]">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+   
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+   
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="/frontend/assets/css/custom.css">
+    <link rel="stylesheet" href="/frontend/assets/css/tailwind.css">
+    
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            letter-spacing: -0.02em;
+            background-color: #f8faf9;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-[#062621]">
+    <script>
+        // Check if user is logged in
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '/frontend/auth/login.html?message=Login First';
+        }
+    </script>
+    <div id="sidebar-container"></div>
+
+    <div class="md:ml-64 min-h-screen transition-all duration-300">
+        
+        <!-- TOP HEADER -->
+        <header class="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-100 px-8 py-5 flex items-center justify-between">
+            <div>
+                <h1 class="text-xl font-extrabold text-[#062621] tracking-tighter uppercase">Your Profile</h1>
+                <p class="text-[10px] text-gray-400 font-bold tracking-widest uppercase opacity-70 mt-1">View Your Information</p>
+            </div>
+            <a href="/frontend/user/user-dashboard.html" class="text-[#062621] text-2xl font-bold leading-none hover:text-red-500 transition" aria-label="Close profile">✕</a>
+        </header>
+
+        <div class="p-8 max-w-4xl mx-auto">
+            <div id="userProfileMsg" class="hidden mb-6 text-center text-sm"></div>
+
+            <!-- PROFILE CARD -->
+            <div class="bg-white rounded-[2.5rem] shadow-xl border border-white p-8">
+                <div class="flex flex-col md:flex-row gap-8 items-start mb-8 pb-8 border-b border-gray-100">
+                    <!-- Profile Picture and Edit -->
+                    <div class="flex flex-col items-center">
+                        <img id="profile-picture" src="/frontend/assets/images/image.png" alt="Profile Picture" class="w-32 h-32 rounded-full object-cover border-4 border-emerald-200 shadow-md mb-6">
+                        <button id="edit-profile-btn" class="w-full bg-[#062621] text-white px-8 py-3 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] transition hover:opacity-95 shadow-xl shadow-emerald-950/10">Edit Profile</button>
+                    </div>
+
+                    <!-- Profile Info -->
+                    <div class="flex-1">
+                        <h3 id="user-fullname" class="text-2xl md:text-3xl font-extrabold text-[#062621] mb-2"></h3>
+                        <p id="user-role" class="hidden text-gray-500 text-sm mb-6"></p>
+
+                        <!-- Info Grid -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-gray-50 rounded-2xl p-4">
+                                <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.15em] mb-1">Email</p>
+                                <p id="user-email" class="text-sm font-semibold text-[#062621]"></p>
+                            </div>
+                            <div class="bg-gray-50 rounded-2xl p-4">
+                                <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.15em] mb-1">Phone</p>
+                                <p id="user-phone" class="text-sm font-semibold text-[#062621]"></p>
+                            </div>
+                            <div class="bg-gray-50 rounded-2xl p-4">
+                                <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.15em] mb-1">Address</p>
+                                <p id="user-address" class="text-sm font-semibold text-[#062621]"></p>
+                            </div>
+                            <div class="bg-gray-50 rounded-2xl p-4">
+                                <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.15em] mb-1">Member Since</p>
+                                <p id="user-member-since" class="text-sm font-semibold text-[#062621]"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QUICK LINKS -->
+                <div>
+                    <h3 class="text-base font-bold text-[#062621] uppercase tracking-tight mb-4">Quick Links</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <a href="/frontend/user/pages/vehicle/add-vehicle.html" class="group rounded-2xl px-6 py-5 bg-gray-50 border border-gray-100 hover:border-emerald-200 hover:bg-emerald-50 transition duration-200">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                                    <i data-lucide="car" class="w-6 h-6 text-emerald-600"></i>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-[#062621] leading-tight mb-1">My Vehicles</p>
+                                    <p class="text-xs text-gray-500">Manage your vehicles</p>
+                                </div>
+                            </div>
+                        </a>
+
+                        <a href="/frontend/user/pages/bookAppoinment/bookings.html" class="group rounded-2xl px-6 py-5 bg-gray-50 border border-gray-100 hover:border-emerald-200 hover:bg-emerald-50 transition duration-200">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                                    <i data-lucide="calendar" class="w-6 h-6 text-emerald-600"></i>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-[#062621] leading-tight mb-1">My Bookings</p>
+                                    <p class="text-xs text-gray-500">View your bookings</p>
+                                </div>
+                            </div>
+                        </a>
+
+                        <a href="/frontend/user/pages/request/request.html" class="group rounded-2xl px-6 py-5 bg-gray-50 border border-gray-100 hover:border-emerald-200 hover:bg-emerald-50 transition duration-200">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                                    <i data-lucide="package" class="w-6 h-6 text-emerald-600"></i>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-[#062621] leading-tight mb-1">My Requests</p>
+                                    <p class="text-xs text-gray-500">View your part requests</p>
+                                </div>
+                            </div>
+                        </a>
+
+                        <a href="/frontend/user/pages/orderHistory/order.html" class="group rounded-2xl px-6 py-5 bg-gray-50 border border-gray-100 hover:border-emerald-200 hover:bg-emerald-50 transition duration-200">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                                    <i data-lucide="shopping-bag" class="w-6 h-6 text-emerald-600"></i>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-[#062621] leading-tight mb-1">My Orders</p>
+                                    <p class="text-xs text-gray-500">View your orders</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+        <script src="../../../assets/js/alert.js"></script>
+        <script src="../../js/users.js"></script>
+        <script>
+            // Initialize sidebar
+            fetch('/frontend/user/includes/sidebar-user.html')
+                .then(res => res.text())
+                .then(data => {
+                    document.getElementById('sidebar-container').innerHTML = data;
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+
+                    
+                    const currentPath = window.location.pathname;
+                    document.querySelectorAll('[data-nav-link]').forEach(link => {
+                        const href = link.getAttribute('href');
+                        if (href && currentPath.includes(href.split('/').pop())) {
+                            link.classList.add('bg-emerald-600', 'shadow-lg', 'text-white', 'font-semibold');
+                            link.classList.remove('text-white/60', 'hover:bg-white/10');
+                        }
+                    });
+                });
+        </script>
+</body>
+</html>

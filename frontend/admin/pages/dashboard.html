@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Command Center | Yaantra</title>
+    
+   
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="../../assets/css/custom.css">
+    <link rel="stylesheet" href="../../assets/css/tailwind.css">
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            letter-spacing: -0.02em;
+        }
+        .custom-shadow { shadow: 0 10px 40px -10px rgba(6, 38, 33, 0.05); }
+    </style>
+</head>
+<body class="bg-[#f4f7f6] min-h-screen text-[#062621]">
+
+<!-- Auth Guard -->
+<script>
+    const token = localStorage.getItem('token');
+    const userRole = localStorage.getItem('userRole');
+    if (!token || userRole !== 'Admin') {
+        window.location.href = '/frontend/auth/login.html?message=Login First';
+    }
+</script>
+
+<div id="sidebar-container"></div>
+
+<div class="md:ml-64 min-h-screen pb-10 transition-all duration-300">
+    
+    <!-- TOP HEADER -->
+    <header class="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-100 px-8 py-5 flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-extrabold text-[#062621] tracking-tighter uppercase">Admin Command Center</h1>
+            <p class="text-[10px] text-gray-400 font-bold tracking-widest uppercase opacity-70">Real-time system oversight and analytics.</p>
+        </div>
+        
+        <div class="flex items-center gap-4">
+            <div class="text-right hidden sm:block">
+                <p id="navProfileName" class="text-sm font-bold text-[#062621]">Administrator</p>
+                <p class="text-[9px] text-emerald-600 font-extrabold tracking-widest uppercase">System Root</p>
+            </div>
+            <div id="navProfileInitials" class="w-10 h-10 rounded-full bg-[#062621] text-white flex items-center justify-center font-bold text-xs border-2 border-white shadow-lg">
+                AD
+            </div>
+        </div>
+    </header>
+
+    <div class="p-8 space-y-8 max-w-[1600px] mx-auto">
+        
+        <!-- STATS SECTION  -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            
+            <!-- Link to Customers -->
+            <a href="/frontend/admin/pages/customers/customers.html" class="bg-white rounded-[2rem] shadow-sm p-7 flex items-center gap-5 border border-white hover:shadow-xl hover:scale-[1.02] transition-all cursor-pointer">
+                <div class="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center flex-shrink-0 text-emerald-600">
+                    <i data-lucide="users" class="w-6 h-6"></i>
+                </div>
+                <div class="flex-1">
+                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Customers</p>
+                    <p id="statCustomers" class="text-3xl font-extrabold text-[#062621]">0</p>
+                </div>
+                <div class="text-[10px] font-bold text-emerald-500 bg-emerald-50 px-2 py-1 rounded-lg">+12.5%</div>
+            </a>
+
+            <!-- Link to Staff -->
+            <a href="/frontend/admin/pages/staff/staff.html" class="bg-white rounded-[2rem] shadow-sm p-7 flex items-center gap-5 border border-white hover:shadow-xl hover:scale-[1.02] transition-all cursor-pointer">
+                <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center flex-shrink-0 text-blue-600">
+                    <i data-lucide="user-check" class="w-6 h-6"></i>
+                </div>
+                <div class="flex-1">
+                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Active Staff</p>
+                    <p id="statVendors" class="text-3xl font-extrabold text-[#062621]">0</p>
+                </div>
+            </a>
+
+            <!-- Link to Products -->
+            <a href="/frontend/admin/pages/products/products.html" class="bg-white rounded-[2rem] shadow-sm p-7 flex items-center gap-5 border border-white hover:shadow-xl hover:scale-[1.02] transition-all cursor-pointer">
+                <div class="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center flex-shrink-0 text-purple-600">
+                    <i data-lucide="package" class="w-6 h-6"></i>
+                </div>
+                <div class="flex-1">
+                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Products</p>
+                    <p id="statPendingBookings" class="text-3xl font-extrabold text-[#062621]">0</p>
+                </div>
+            </a>
+
+            <!-- Opens Low Stock Modal -->
+            <div onclick="openLowStockPopupModal()" class="bg-white rounded-[2rem] shadow-sm p-7 flex items-center gap-5 border border-white hover:shadow-xl hover:scale-[1.02] transition-all cursor-pointer">
+                <div class="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center flex-shrink-0 text-orange-600">
+                    <i data-lucide="activity" class="w-6 h-6"></i>
+                </div>
+                <div class="flex-1">
+                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">System Health</p>
+                    <p id="statLowStockProducts" class="text-3xl font-extrabold text-[#062621]">99.9%</p>
+                </div>
+                <div class="text-[10px] font-bold text-orange-400 uppercase tracking-tighter">Inventory</div>
+            </div>
+        </section>
+
+        <!-- MIDDLE SECTION (Orders & Inventory) -->
+        <section class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+            <div class="xl:col-span-2 bg-white rounded-[2.5rem] shadow-sm border border-white overflow-hidden">
+                <div class="px-8 py-6 flex items-center justify-between">
+                    <h2 class="text-base font-bold text-[#062621] uppercase tracking-tight">System Audit Logs</h2>
+                    <a href="./purchases/purchases.html" class="text-[10px] bg-[#062621] text-white px-4 py-2 rounded-xl font-bold uppercase tracking-widest hover:opacity-90 transition">View all</a>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead class="bg-[#062621]/[0.02] text-[10px] text-gray-400 uppercase tracking-[0.2em] border-y border-gray-50">
+                            <tr>
+                                <th class="px-8 py-4 font-bold">Action / Order</th>
+                                <th class="px-8 py-4 font-bold">Timestamp</th>
+                                <th class="px-8 py-4 font-bold">Amount</th>
+                                <th class="px-8 py-4 font-bold text-right">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentOrdersTable" class="divide-y divide-gray-50 text-sm">
+                            <tr><td colspan="4" class="py-10 text-center text-gray-400 italic">Scanning database...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-[2.5rem] shadow-sm border border-white overflow-hidden">
+                <div id="lowStockSectionHeader" class="px-8 py-6">
+                    <h2 class="text-base font-bold text-[#062621] uppercase tracking-tight">Low Stock Alerts</h2>
+                </div>
+                <div class="px-2">
+                    <table class="w-full text-left text-sm">
+                        <thead class="text-[10px] text-gray-400 uppercase tracking-widest border-b border-gray-50">
+                            <tr>
+                                <th class="px-6 py-4 font-bold">Product</th>
+                                <th class="px-6 py-4 font-bold text-right">Units</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lowStockDashboardList" class="divide-y divide-gray-50">
+                            <tr><td colspan="2" class="py-10 text-center text-gray-400 italic">Checking inventory...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- RECENT CUSTOMERS -->
+        <section class="bg-white rounded-[2.5rem] shadow-sm border border-white overflow-hidden">
+            <div class="px-8 py-6 flex items-center justify-between">
+                <h2 class="text-base font-bold text-[#062621] uppercase tracking-tight">Recent User Registry</h2>
+                <a href="./customers/customers.html" class="text-[10px] text-emerald-600 font-bold bg-emerald-50 px-4 py-2 rounded-xl hover:bg-emerald-100 transition tracking-widest uppercase">Manage Registry</a>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-[#062621]/[0.02] text-[10px] text-gray-400 uppercase tracking-[0.2em] border-y border-gray-50">
+                        <tr>
+                            <th class="px-8 py-4 font-bold">Name</th>
+                            <th class="px-8 py-4 font-bold">Email</th>
+                            <th class="px-8 py-4 font-bold">Role</th>
+                            <th class="px-8 py-4 font-bold text-right">Joined At</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recentUsersTable" class="divide-y divide-gray-50 text-sm">
+                        <tr><td colspan="4" class="py-10 text-center text-gray-400 italic">Syncing personnel records...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</div>
+
+<!-- Modal for Low Stock -->
+<div id="lowStockPopupModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm px-4">
+    <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-2xl overflow-hidden">
+        <div class="bg-[#062621] px-8 py-5 flex items-center justify-between text-white">
+            <h2 class="font-bold uppercase tracking-widest text-xs">Inventory Alerts</h2>
+            <button id="closeLowStockPopupBtn" class="text-2xl" onclick="toggleModal('lowStockPopupModal', false)">&times;</button>
+        </div>
+        <div id="lowStockPopupList" class="p-6 space-y-3 max-h-[60vh] overflow-y-auto font-medium"></div>
+    </div>
+</div>
+
+<script>
+const API = 'http://localhost:5033/api';
+const notificationsApiBase = `${API}/notifications/admin/low-stock?includeRead=true`;
+const dashboardState = { lowStockNotices: [] };
+
+function statusBadge(status) {
+    const value = (status || '').toLowerCase();
+    const map = {
+        pending: 'bg-amber-50 text-amber-600 border-amber-100',
+        completed: 'bg-emerald-50 text-emerald-600 border-emerald-100',
+        processing: 'bg-blue-50 text-blue-600 border-blue-100',
+        cancelled: 'bg-red-50 text-red-600 border-red-100'
+    };
+    const css = map[value] || 'bg-gray-50 text-gray-400 border-gray-100';
+    return `<span class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border ${css}">${escapeHtml(status || 'Unknown')}</span>`;
+}
+
+function formatDate(value) {
+    if (!value) return '—';
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) return '—';
+    return parsed.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function escapeHtml(value) {
+    return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+async function loadDashboardData() {
+    const token = localStorage.getItem('token');
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+    try {
+        const [summaryRes, pendingBookingsRes, ordersRes, usersRes] = await Promise.allSettled([
+            fetch(`${API}/dashboard/summary`, { headers }),
+            fetch(`${API}/BookingAppointment/admin/bookings?page=1&pageSize=100&status=pending`, { headers }),
+            fetch(`${API}/Orders?page=1&pageSize=100`, { headers }),
+            fetch(`${API}/Users?page=1&pageSize=100`, { headers })
+        ]);
+
+        if (summaryRes.status === 'fulfilled' && summaryRes.value.ok) {
+            const summary = await summaryRes.value.json();
+            document.getElementById('statCustomers').textContent = String(summary.totalUsers || summary.totalCustomers || 0);
+            document.getElementById('statVendors').textContent = String(summary.totalVendors || 0);
+        }
+
+        if (pendingBookingsRes.status === 'fulfilled' && pendingBookingsRes.value.ok) {
+            const payload = await pendingBookingsRes.value.json();
+            document.getElementById('statPendingBookings').textContent = String(payload.totalRecords || payload.length || 0);
+        }
+
+        const ordersTable = document.getElementById('recentOrdersTable');
+        if (ordersRes.status === 'fulfilled' && ordersRes.value.ok) {
+            const orderData = await ordersRes.value.json();
+            const orders = Array.isArray(orderData) ? orderData : (orderData.data || []);
+            ordersTable.innerHTML = orders.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate)).slice(0, 5).map(order => `
+                <tr class="hover:bg-gray-50 transition">
+                    <td class="px-8 py-4 text-[#062621] font-bold">${escapeHtml(order.orderNumber || `#${order.id}`)}</td>
+                    <td class="px-8 py-4 text-gray-400 text-xs font-medium">${formatDate(order.orderDate)}</td>
+                    <td class="px-8 py-4 font-bold">Rs ${(order.grandTotal ?? order.totalAmount ?? 0).toLocaleString()}</td>
+                    <td class="px-8 py-4 text-right">${statusBadge(order.status)}</td>
+                </tr>`).join('');
+        }
+
+        const usersTable = document.getElementById('recentUsersTable');
+        if (usersRes.status === 'fulfilled' && usersRes.value.ok) {
+            const userData = await usersRes.value.json();
+            const users = Array.isArray(userData) ? userData : (userData.data || []);
+            usersTable.innerHTML = users.filter(u => (u.role || '').toUpperCase() !== 'ADMIN').slice(0, 5).map(user => `
+                <tr class="hover:bg-gray-50 transition">
+                    <td class="px-8 py-4 text-[#062621] font-bold">${escapeHtml(`${user.firstName || ''} ${user.lastName || ''}`.trim())}</td>
+                    <td class="px-8 py-4 text-gray-500 font-medium text-xs">${escapeHtml(user.email || '—')}</td>
+                    <td class="px-8 py-4 font-black text-emerald-600 text-[9px] uppercase tracking-widest">${escapeHtml(user.role)}</td>
+                    <td class="px-8 py-4 text-right text-gray-400 font-bold text-xs">${formatDate(user.createdAt)}</td>
+                </tr>`).join('');
+        }
+    } catch (e) { console.error(e); }
+}
+
+async function loadLowStockNotices() {
+    try {
+        const response = await fetch(notificationsApiBase);
+        if (response.ok) {
+            dashboardState.lowStockNotices = await response.json();
+            renderLowStockAlerts();
+        }
+    } catch (e) {}
+}
+
+function renderLowStockAlerts() {
+    const list = document.getElementById('lowStockDashboardList');
+    if (!list) return;
+    const notices = dashboardState.lowStockNotices || [];
+    list.innerHTML = notices.slice(0, 5).map(notice => `
+        <tr class="hover:bg-gray-50">
+            <td class="px-6 py-4 font-bold text-[#062621] text-xs">${escapeHtml(notice.message.split('has')[0].replace('Low stock alert:', ''))}</td>
+            <td class="px-6 py-4 text-right text-red-500 font-black text-xs">${notice.message.match(/\d+/)[0]} units</td>
+        </tr>`).join('');
+}
+
+function openLowStockPopupModal() { toggleModal('lowStockPopupModal', true); }
+function toggleModal(id, show) {
+    const modal = document.getElementById(id);
+    if (show) modal.classList.remove('hidden'), modal.classList.add('flex');
+    else modal.classList.add('hidden'), modal.classList.remove('flex');
+}
+
+// Sidebar Injection
+fetch('/frontend/admin/includes/sidebar-admin.html')
+        .then(res => res.text())
+        .then(data => {
+            document.getElementById('sidebar-container').innerHTML = data;
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+
+           
+            const currentPath = window.location.pathname;
+            document.querySelectorAll('[data-nav-link]').forEach(link => {
+                if (currentPath.includes(link.getAttribute('href'))) {
+                   
+                    link.classList.add('bg-[#10b981]', 'shadow-xl');
+                    
+                    
+                    link.classList.remove('text-white/70', 'text-white');
+                    link.classList.add('text-[#062621]', 'font-bold');
+                    
+                   
+                    const icon = link.querySelector('i');
+                    if (icon) {
+                        icon.setAttribute('stroke', '#062621');
+                    }
+                }
+            });
+        });
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadDashboardData();
+    loadLowStockNotices();
+});
+</script>
+</body>
+</html>

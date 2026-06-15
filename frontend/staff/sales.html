@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yaantra | Counter Sales & Billing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { primary: '#062621', 'primary-light': '#0a362f' }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f0f2f1; }
+        .boxed-input {
+            width: 100%; background-color: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 1rem;
+            padding: 0.7rem 1rem; font-size: 0.8rem; outline: none; transition: all 0.2s;
+        }
+        .boxed-input:focus { border-color: #062621; background-color: #fff; }
+        .label-style { font-size: 10px; font-weight: 800; text-transform: uppercase; color: #062621; margin-bottom: 0.4rem; display: block; }
+        .btn-primary { background: #062621; color: white; padding: 0.8rem; border-radius: 1rem; font-weight: 700; width: 100%; cursor: pointer; transition: all 0.2s; }
+        .btn-primary:hover { background: #0a362f; transform: translateY(-1px); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .modal-overlay { display: none; position: fixed; inset: 0; z-index: 100; background: rgba(6,38,33,0.6); backdrop-filter: blur(4px); align-items: center; justify-content: center; padding: 1rem; }
+        .modal-overlay.active { display: flex; }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        @media print { .no-print { display: none !important; } .modal-overlay { position: relative; background: none; } }
+    </style>
+</head>
+<body class="flex min-h-screen">
+    <div id="sidebar-placeholder" class="no-print"></div>
+
+    <main class="ml-64 flex-1">
+        <!-- Header -->
+        <header class="bg-white/80 backdrop-blur-md p-6 flex justify-between items-center shadow-sm sticky top-0 z-10 border-b border-gray-100 no-print">
+            <div>
+                <h2 class="text-2xl font-bold text-primary">New Sales Invoice</h2>
+                <p class="text-xs text-gray-400">Process counter sales and update stock automatically.</p>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="text-right">
+                    <p class="text-sm font-bold text-primary" id="userName">Staff User</p>
+                    <span class="text-[9px] uppercase tracking-widest text-gray-400 font-extrabold">Sales Desk</span>
+                </div>
+                <img id="userProfilePic" src="" class="w-10 h-10 rounded-full border border-gray-200 object-cover bg-white">
+            </div>
+        </header>
+
+        <section class="p-8 no-print">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                
+                <!-- LEFT: Catalog -->
+                <div class="lg:col-span-7 space-y-6">
+                    <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100 h-full">
+                        <div class="relative mb-6">
+                            <i data-lucide="search" class="absolute left-4 top-3 w-5 h-5 text-gray-400"></i>
+                            <input type="text" id="partSearch" placeholder="Search parts by name or SKU..." class="boxed-input pl-12" oninput="filterParts(this.value)">
+                        </div>
+                        <div id="partsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[65vh] overflow-y-auto pr-2 custom-scrollbar">
+                            <!-- Items injected by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT: Invoice Cart -->
+                <div class="lg:col-span-5">
+                    <div class="bg-white p-8 rounded-[2.5rem] shadow-xl border border-gray-100 sticky top-28">
+                        <h3 class="text-lg font-bold text-primary mb-6 flex items-center gap-2">
+                            <i data-lucide="shopping-bag" class="w-5 h-5"></i> Current Cart
+                        </h3>
+
+                        <!-- Customer Info -->
+                        <div class="space-y-4 mb-6">
+                            <div>
+                                <label class="label-style">Registered Customer</label>
+                                <select id="saleCustomer" class="boxed-input" onchange="handleCustomerSelect()">
+                                    <option value="">-- Walk-in Customer --</option>
+                                </select>
+                            </div>
+                            <div id="walkInFields" class="space-y-3">
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div>
+                                        <label class="label-style">Customer Name *</label>
+                                        <input type="text" id="walkInName" placeholder="Full Name" class="boxed-input">
+                                    </div>
+                                    <div>
+                                        <label class="label-style">Phone Number</label>
+                                        <input type="text" id="walkInPhone" placeholder="98XXXXXXXX" class="boxed-input">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="label-style">Email Address (Optional)</label>
+                                    <input type="email" id="walkInEmail" placeholder="customer@email.com" class="boxed-input">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payment Options -->
+                        <div class="grid grid-cols-2 gap-3 mb-6">
+                            <div>
+                                <label class="label-style">Method</label>
+                                <select id="paymentMethod" class="boxed-input text-xs font-bold">
+                                    <option value="Cash">Cash</option>
+                                    <option value="FonePay">Online (FonePay)</option>
+                                    <option value="Card">Credit Card</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="label-style">Status</label>
+                                <select id="paymentStatus" class="boxed-input text-xs font-bold">
+                                    <option value="Paid">Full Paid</option>
+                                    <option value="Pending">Pending / Credit</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Cart Items -->
+                        <div id="invoiceItems" class="space-y-3 mb-6 min-h-[100px] max-h-[300px] overflow-y-auto custom-scrollbar">
+                            <p class="text-center py-10 text-gray-300 italic text-xs border-2 border-dashed border-gray-50 rounded-2xl">Your cart is empty</p>
+                        </div>
+
+                        <!-- Billing Summary -->
+                        <div class="bg-gray-50 p-5 rounded-2xl space-y-2">
+                            <div class="flex justify-between text-xs font-bold text-gray-500">
+                                <span>Subtotal</span>
+                                <span id="lblSubtotal">Rs. 0.00</span>
+                            </div>
+                            <div data-discount-row class="hidden flex justify-between items-center text-xs font-bold text-red-500">
+                                <span>Loyalty Discount (10%)</span>
+                                <span data-discount-amount>- Rs. 0.00</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs font-bold text-gray-500">
+                                <span>Additional Discount (Rs.)</span>
+                                <input type="number" id="saleDiscount" value="0" min="0" class="w-20 text-right bg-transparent border-b border-gray-300 outline-none focus:border-primary" oninput="calculateTotals()">
+                            </div>
+                            <div class="flex justify-between items-center pt-3 border-t border-gray-200">
+                                <span class="font-black text-primary uppercase text-[10px]">Grand Total</span>
+                                <span class="text-xl font-black text-primary" id="lblGrandTotal">Rs. 0.00</span>
+                            </div>
+                        </div>
+
+                        <button onclick="processSale()" id="btnProcess" class="btn-primary mt-6 flex items-center justify-center gap-2">
+                            <i data-lucide="file-text" class="w-5 h-5"></i> Generate Invoice
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- PROFESSIONAL INVOICE MODAL -->
+    <div id="invoiceModal" class="modal-overlay">
+        <div class="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col h-auto max-h-[95vh]">
+            
+            <!-- Printable Area Start -->
+            <div id="printableInvoice" class="p-8 bg-white text-gray-800 overflow-y-auto custom-scrollbar" style="color: #1f2937; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                
+                <!-- Header with Brand -->
+                <div style="background: linear-gradient(135deg, #062621 0%, #0a362f 100%); padding: 32px; margin: -32px -32px 32px -32px; text-align: center; color: white;">
+                    <h1 style="margin: 0; font-size: 36px; font-weight: 900; letter-spacing: 2px;">YAANTRA</h1>
+                    <p style="margin: 8px 0 0 0; font-size: 12px; color: #c1e5e1; text-transform: uppercase; letter-spacing: 2px; font-weight: 600;">Vehicle & Parts Service</p>
+                </div>
+
+                <!-- Invoice Header -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px; border-bottom: 2px solid #e5e7eb; padding-bottom: 24px;">
+                    <div>
+                        <h2 style="margin: 0; font-size: 18px; font-weight: 700; color: #062621; margin-bottom: 12px;">TAX INVOICE</h2>
+                        <p style="margin: 6px 0; font-size: 13px; color: #6b7280;"><strong style="color: #111827;">Invoice #:</strong> <span id="inv-number">#INV-000000</span></p>
+                        <p style="margin: 6px 0; font-size: 13px; color: #6b7280;"><strong style="color: #111827;">Date:</strong> <span id="inv-date">2024-01-01</span></p>
+                    </div>
+                    <div style="text-align: right;">
+                        <p style="margin: 6px 0; font-size: 12px; color: #6b7280;"><strong>Payment Method:</strong></p>
+                        <p style="margin: 0; font-size: 14px; font-weight: 700; color: #062621;" id="inv-payment-method">Cash</p>
+                        <p style="margin: 12px 0 0 0; font-size: 12px; color: #6b7280;"><strong>Status:</strong></p>
+                        <p style="margin: 0; font-size: 14px; font-weight: 700; color: #059669;" id="inv-payment-status">PAID</p>
+                    </div>
+                </div>
+
+                <!-- Customer Info -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px; background-color: #f9fafb; padding: 20px; border-radius: 8px;">
+                    <div>
+                        <p style="margin: 0 0 8px 0; font-size: 11px; color: #6b7280; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Bill To</p>
+                        <p style="margin: 0; font-size: 14px; font-weight: 700; color: #111827;" id="inv-customer-name">Customer Name</p>
+                        <p style="margin: 4px 0 0 0; font-size: 12px; color: #6b7280;" id="inv-customer-phone">+977 XXXXXXXXXX</p>
+                    </div>
+                    <div>
+                        <p style="margin: 0 0 8px 0; font-size: 11px; color: #6b7280; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Served By</p>
+                        <p style="margin: 0; font-size: 14px; font-weight: 700; color: #111827;">Yaantra Staff</p>
+                        <p style="margin: 4px 0 0 0; font-size: 12px; color: #6b7280;">Professional Service</p>
+                    </div>
+                </div>
+
+                <!-- Items Table -->
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px;">
+                    <thead>
+                        <tr style="background-color: #f3f4f6; border-top: 2px solid #e5e7eb; border-bottom: 2px solid #e5e7eb;">
+                            <th style="padding: 12px; text-align: left; font-size: 12px; font-weight: 700; color: #374151; text-transform: uppercase; letter-spacing: 0.5px;">Item</th>
+                            <th style="padding: 12px; text-align: center; font-size: 12px; font-weight: 700; color: #374151; text-transform: uppercase; letter-spacing: 0.5px;">Qty</th>
+                            <th style="padding: 12px; text-align: right; font-size: 12px; font-weight: 700; color: #374151; text-transform: uppercase; letter-spacing: 0.5px;">Unit Price</th>
+                            <th style="padding: 12px; text-align: right; font-size: 12px; font-weight: 700; color: #374151; text-transform: uppercase; letter-spacing: 0.5px;">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inv-items-body">
+                        <!-- JS Injected rows -->
+                    </tbody>
+                </table>
+
+                <!-- Totals -->
+                <div style="display: flex; justify-content: flex-end; margin-bottom: 32px;">
+                    <div style="width: 280px; border: 2px solid #e5e7eb; border-radius: 8px; padding: 20px; background-color: #f9fafb;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 13px; border-bottom: 1px solid #e5e7eb; padding-bottom: 12px;">
+                            <span style="color: #6b7280; font-weight: 600;">Sub Total:</span>
+                            <span style="color: #111827; font-weight: 700;" id="inv-subtotal">Rs. 0.00</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 16px; font-size: 13px; color: #dc2626;">
+                            <span style="font-weight: 600;">Discount:</span>
+                            <span style="font-weight: 700;" id="inv-discount">- Rs. 0.00</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 16px; padding-top: 12px; border-top: 2px solid #e5e7eb;">
+                            <span style="color: #111827; font-weight: 700;">Grand Total:</span>
+                            <span style="color: #062621; font-weight: 900; font-size: 18px;" id="inv-total">Rs. 0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Printable Area End -->
+
+            <div class="bg-gray-50 p-6 flex gap-3 border-t border-gray-100 no-print">
+                <button onclick="printReceipt()" class="flex-1 bg-white border border-gray-200 py-3 rounded-xl font-bold text-gray-600 hover:bg-gray-100 transition-all flex items-center justify-center gap-2">
+                    <i data-lucide="printer" class="w-4 h-4"></i> Print PDF
+                </button>
+                <button id="btnEmailInvoice" onclick="emailInvoice()" class="flex-1 btn-primary flex items-center justify-center gap-2">
+                    <i data-lucide="mail" class="w-4 h-4"></i> Send Email
+                </button>
+                <button onclick="location.reload()" class="px-6 py-3 rounded-xl font-bold text-gray-400 hover:text-primary transition-all">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/staff.js"></script>
+    <script src="js/sales.js"></script>
+    <script>
+       
+        window.addEventListener('DOMContentLoaded', () => {
+            includeSidebar();
+            loadStaffProfile();
+            setTimeout(() => lucide.createIcons(), 100);
+        });
+    </script>
+</body>
+</html>

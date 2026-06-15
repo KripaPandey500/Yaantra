@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yaantra | Staff Dashboard</title>
+    
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#062621',
+                        'primary-light': '#0a362f',
+                        accent: '#f8faf9',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f0f2f1; }
+    </style>
+<body class="flex min-h-screen">
+
+    <div id="sidebar-placeholder"></div>
+
+    <main class="ml-64 flex-1">
+  
+        <!-- Header -->
+        <header class="bg-white/80 backdrop-blur-md p-6 flex justify-between items-center shadow-sm sticky top-0 z-10 border-b border-gray-100">
+            <div>
+                <h2 class="text-2xl font-bold text-primary">Operational Overview</h2>
+                <p class="text-xs text-gray-400">Welcome back, <span id="welcomeName" class="font-bold">Staff</span>.</p>
+            </div>
+
+            <div class="flex items-center gap-6">
+                <div class="flex items-center gap-4 border-l pl-6">
+                    <div class="text-right">
+                        <!-- AUTOMATIC NAME -->
+                        <p class="text-sm font-bold text-primary" id="userName">Loading...</p>
+                    </div>
+                    <!-- AUTOMATIC PROFILE PIC -->
+                    <img id="userProfilePic" src="https://ui-avatars.com/api/?name=Staff" class="w-12 h-12 rounded-full border-2 border-primary/10 object-cover shadow-sm bg-white">
+                </div>
+            </div>
+        </header>
+
+        <!-- Stats Grid -->
+        <section class="p-10 space-y-10">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Stat 1: Customers -->
+                <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 hover:shadow-xl transition-all">
+                    <div class="w-12 h-12 bg-primary/5 text-primary rounded-2xl flex items-center justify-center mb-6">
+                        <i data-lucide="user-check" class="w-6 h-6"></i>
+                    </div>
+                    <p class="text-gray-400 text-[10px] font-extrabold uppercase tracking-widest">Active Customers</p>
+                    <h3 class="text-4xl font-bold text-primary mt-1" id="stat-customers">...</h3>
+                </div>
+
+                <!-- Stat 2: Vehicles -->
+                <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 hover:shadow-xl transition-all">
+                    <div class="w-12 h-12 bg-primary/5 text-primary rounded-2xl flex items-center justify-center mb-6">
+                        <i data-lucide="car" class="w-6 h-6"></i>
+                    </div>
+                    <p class="text-gray-400 text-[10px] font-extrabold uppercase tracking-widest">Registered Vehicles</p>
+                    <h3 class="text-4xl font-bold text-primary mt-1" id="stat-vehicles">...</h3>
+                </div>
+
+                <!-- Stat 3: Revenue -->
+                <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 hover:shadow-xl transition-all">
+                    <div class="w-12 h-12 bg-primary/5 text-primary rounded-2xl flex items-center justify-center mb-6">
+                        <i data-lucide="banknote" class="w-6 h-6"></i>
+                    </div>
+                    <p class="text-gray-400 text-[10px] font-extrabold uppercase tracking-widest">Total Revenue</p>
+                    <h3 class="text-4xl font-bold text-primary mt-1" id="stat-revenue">Rs. 0.00</h3>
+                </div>
+            </div>
+
+            <!-- Operational Table -->
+            <div class="bg-white rounded-[3rem] shadow-sm border border-gray-100 overflow-hidden">
+                <div class="p-10 border-b border-gray-50 flex justify-between items-center">
+                    <h3 class="text-lg font-bold text-primary">Recent Customer Registrations</h3>
+                    <button onclick="loadDashboardData()" class="bg-primary text-white text-[10px] font-bold px-6 py-2.5 rounded-full uppercase tracking-widest hover:bg-primary-light transition-all shadow-lg">Refresh Logs</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-gray-50/50">
+                            <tr>
+                                <th class="px-8 py-4 text-[10px] uppercase tracking-widest text-gray-400 font-black">Customer</th>
+                                <th class="px-8 py-4 text-[10px] uppercase tracking-widest text-gray-400 font-black">Contact</th>
+                                <th class="px-8 py-4 text-[10px] uppercase tracking-widest text-gray-400 font-black">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentLogsTable">
+                            <tr>
+                                <td colspan="3" class="p-20 text-center text-gray-400 italic text-sm">
+                                    Loading latest operations...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Scripts -->
+    <script src="js/staff.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            includeSidebar();
+            loadStaffProfile();
+            loadDashboardData();
+        });
+    </script>
+</body>
+</html>

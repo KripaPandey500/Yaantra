@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Procurement Logs | Yaantra Admin</title>
+    
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="../../../assets/css/custom.css">
+    
+    <style>
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        #lowStockPopupModal:not(.hidden) > div,
+        #deleteConfirmModal:not(.hidden) > div {
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        #lowStockPopupModal:not(.hidden),
+        #deleteConfirmModal:not(.hidden) {
+            display: flex !important;
+        }
+    </style>
+    <link rel="stylesheet" href="../../../assets/css/tailwind.css">
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            letter-spacing: -0.02em;
+            background-color: #f8faf9;
+        }
+        .ts-alert-success { 
+            background-color: #ecfdf5; 
+            color: #065f46; 
+            border: 1px solid #10b981; 
+            padding: 1rem; 
+            border-radius: 1rem; 
+            font-weight: 700; 
+        }
+        .ts-alert-error { 
+            background-color: #fef2f2; 
+            color: #991b1b; 
+            border: 1px solid #ef4444; 
+            padding: 1rem; 
+            border-radius: 1rem; 
+            font-weight: 700; 
+        }
+        
+        .table-container {
+            border: 1px solid rgba(16, 185, 129, 0.2); 
+            box-shadow: 0 20px 25px -5px rgba(6, 38, 33, 0.05);
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .modal-active {
+            animation: slideIn 0.3s ease-out;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen text-[#062621]">
+
+<!-- Sidebar Container -->
+<div id="sidebar-container"></div>
+
+<!-- ================= MAIN CONTENT ================= -->
+<div class="md:ml-64 min-h-screen transition-all duration-300">
+    
+    <!-- TOP HEADER -->
+    <header class="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-100 px-8 py-5 flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-extrabold text-[#062621] tracking-tighter uppercase leading-none">Procurement Logs</h1>
+            <p class="text-[10px] text-gray-400 font-bold tracking-widest uppercase opacity-70 mt-1">Vendor Invoice & Stock Intake.</p>
+        </div>
+        
+        <div class="flex items-center gap-3">
+            <!-- LOW STOCK ALERT BUTTON -->
+            <button id="alertBtn" onclick="openLowStockPopupModal()" class="relative bg-red-50 text-red-600 px-5 py-2.5 rounded-xl font-bold text-[11px] uppercase tracking-widest flex items-center gap-2 hover:bg-red-100 transition border border-red-200 hidden">
+                <i data-lucide="alert-circle" class="w-4 h-4"></i>
+                <span>Alerts</span>
+                <span id="alertBadge" class="ml-1 bg-red-600 text-white text-[9px] font-black rounded-full w-5 h-5 flex items-center justify-center">0</span>
+            </button>
+            
+            <!-- REGISTER PURCHASE BUTTON (Linked to add-purchase.html) -->
+            <button onclick="window.location.href='add-purchase.html'" class="bg-[#062621] text-white px-5 py-2.5 rounded-xl font-bold text-[11px] uppercase tracking-widest flex items-center gap-2 hover:opacity-90 transition shadow-lg">
+                <i data-lucide="plus-square" class="w-4 h-4"></i>
+                Add Purchase
+            </button>
+            <!-- REPORTS / ANALYTICS BUTTON (Styled like Category button in your pic) -->
+            <a href="../reports/reports.html" class="bg-emerald-50 text-emerald-700 px-5 py-2.5 rounded-xl font-bold text-[11px] uppercase tracking-widest flex items-center gap-2 hover:bg-emerald-100 transition border border-emerald-100">
+                <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+                View Reports
+            </a>
+        </div>
+    </header>
+
+    <div class="p-8 space-y-8 max-w-[1600px] mx-auto">
+        
+        <!-- ALERT BOX -->
+        <div id="alertBox" class="hidden"></div>
+        
+        <!-- SEARCH BAR -->
+        <div class="relative group">
+            <i data-lucide="search" class="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300 group-focus-within:text-emerald-500 transition"></i>
+            <input id="searchInput" type="text" placeholder="Search invoices by Vendor ID or Invoice ID..." 
+                class="w-full bg-white border-none shadow-sm rounded-2xl py-5 pl-14 pr-6 focus:ring-2 focus:ring-emerald-500/20 outline-none font-medium text-sm transition">
+        </div>
+
+        <!-- PURCHASE TABLE -->
+        <div class="table-container bg-white rounded-[2.5rem] overflow-hidden">
+            <div class="px-8 py-6 flex items-center justify-between border-b border-gray-50">
+                <h2 class="text-base font-bold text-[#062621] uppercase tracking-tight">Active Invoices</h2>
+                <button onclick="loadPurchases()" class="text-gray-400 hover:text-emerald-500 transition">
+                    <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-[#062621] text-white/50 text-[10px] uppercase tracking-[0.2em]">
+                        <tr>
+                            <th class="px-8 py-5 font-bold">S.N</th>
+                            <th class="px-8 py-5 font-bold">Invoice ID</th>
+                            <th class="px-8 py-5 font-bold">Vendor Identifier</th>
+                            <th class="px-8 py-5 font-bold text-center">Intake Date</th>
+                            <th class="px-8 py-5 font-bold">Total Amount</th>
+                            <th class="px-8 py-5 font-bold text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="purchaseTable" class="divide-y divide-gray-50 text-sm font-medium">
+                        <!-- Populated by purchases.js -->
+                        <tr><td colspan="6" class="p-20 text-center text-gray-400 italic">Connecting to inventory logs...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- PAGINATION -->
+            <div class="flex justify-between items-center px-10 py-6 bg-gray-50/50">
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none">Navigation</p>
+                <div class="flex items-center gap-2">
+                    <button id="prevBtn" onclick="prevPage()" class="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-gray-100 hover:bg-emerald-50 transition text-gray-400 disabled:opacity-30">
+                        <i data-lucide="chevron-left" class="w-5 h-5"></i>
+                    </button>
+                    <div id="paginationNumbers" class="flex gap-2"></div>
+                    <button id="nextBtn" onclick="nextPage()" class="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-gray-100 hover:bg-emerald-50 transition text-gray-400 disabled:opacity-30">
+                        <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- VIEW PURCHASE MODAL -->
+<div id="viewPurchaseModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm hidden p-4">
+    <div class="bg-white w-full max-w-2xl rounded-[3rem] shadow-2xl p-10 relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-2 bg-[#062621]"></div>
+        <button onclick="closeModal('viewPurchaseModal')" class="absolute top-6 right-6 text-gray-400 hover:text-[#062621] transition"><i data-lucide="x-circle"></i></button>
+        <div id="viewContent" class="mt-4">
+            
+        </div>
+        <button onclick="closeModal('viewPurchaseModal')" class="mt-8 w-full py-4 bg-gray-50 rounded-2xl font-black text-[10px] uppercase text-gray-400 hover:text-[#062621] transition tracking-widest">Close Invoice</button>
+    </div>
+</div>
+
+
+<div id="lowStockPopupModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+	<div class="bg-white w-full max-w-2xl max-h-[92vh] overflow-hidden flex flex-col border border-red-200 rounded-[2rem] shadow-2xl">
+		<div class="bg-red-600 px-6 py-4 flex items-center justify-center relative rounded-t-[2rem]">
+			<div class="flex items-center gap-3 justify-center">
+				<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 64 64" fill="none">
+					<path d="M8 24L32 11L56 24L46 34L32 28L18 34L8 24Z" fill="#EF4444"/>
+					<path d="M18 34L8 24V38L22 46V33L18 34Z" fill="#B91C1C"/>
+					<path d="M46 34L56 24V38L42 46V33L46 34Z" fill="#B91C1C"/>
+					<path d="M22 46L32 52L42 46V33L32 38L22 33V46Z" fill="#7F1D1D"/>
+					<path d="M32 5L43.5 24.5H20.5L32 5Z" fill="#FEE2E2" stroke="#7F1D1D" stroke-width="2.5"/>
+					<path d="M32 12V18" stroke="#7F1D1D" stroke-width="3" stroke-linecap="round"/>
+					<circle cx="32" cy="21.5" r="1.8" fill="#7F1D1D"/>
+				</svg>
+				<h2 class="text-xl font-bold text-white tracking-wide">Low Stock Alerts</h2>
+			</div>
+			<button id="closeLowStockPopupBtn" class="absolute right-6 top-1/2 -translate-y-1/2 text-white hover:text-red-100 transition-colors text-2xl font-light">&times;</button>
+		</div>
+
+		<div id="lowStockPopupList" class="flex-1 overflow-y-auto p-6 space-y-3">
+			
+		</div>
+	</div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteConfirmModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 hidden">
+	<div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-lg p-8 relative flex flex-col items-center">
+		<div class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
+			<svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+				<polyline points="3 6 5 6 21 6"></polyline>
+				<path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+				<line x1="10" y1="11" x2="10" y2="17"></line>
+				<line x1="14" y1="11" x2="14" y2="17"></line>
+			</svg>
+		</div>
+		<h2 class="text-xl font-extrabold text-[#062621]">Delete Confirmation?</h2>
+		<p class="mb-6 text-gray-600 text-center text-sm" id="deleteConfirmMessage">Are you sure you want to delete this invoice?</p>
+		<div class="flex gap-3 w-full">
+			<button id="cancelDeleteBtn" class="flex-1 py-4 bg-gray-100 text-gray-600 rounded-2xl font-bold text-[10px] uppercase tracking-widest hover:bg-gray-200 transition">Cancel</button>
+			<button id="confirmDeleteBtn" class="flex-1 py-4 bg-red-600 text-white rounded-2xl font-bold text-[10px] uppercase tracking-widest shadow-lg shadow-red-200 hover:bg-red-700 transition">Delete</button>
+		</div>
+		<button id="closeDeleteModalBtn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-2xl font-bold">&times;</button>
+	</div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteConfirmModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 hidden">
+	<div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-lg p-8 relative flex flex-col items-center">
+		<div class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6"><i data-lucide="trash-2" class="w-8 h-8"></i></div>
+		<h2 class="text-xl font-extrabold text-[#062621]">Delete Confirmation?</h2>
+		<p class="mb-6 text-gray-600 text-center text-sm" id="deleteConfirmMessage">Are you sure you want to delete this invoice?</p>
+		<div class="flex gap-3 w-full">
+			<button id="cancelDeleteBtn" onclick="closeModal('deleteConfirmModal')" class="flex-1 py-4 bg-gray-100 text-gray-600 rounded-2xl font-bold text-[10px] uppercase tracking-widest hover:bg-gray-200 transition">Cancel</button>
+			<button id="confirmDeleteBtn" class="flex-1 py-4 bg-red-600 text-white rounded-2xl font-bold text-[10px] uppercase tracking-widest shadow-lg shadow-red-200 hover:bg-red-700 transition">Delete</button>
+		</div>
+		<button id="closeDeleteModalBtn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-2xl font-bold">&times;</button>
+	</div>
+</div>
+
+<script src="../../js/purchases.js"></script>
+<script>
+    // SIDEBAR INJECTION
+    fetch('/frontend/admin/includes/sidebar-admin.html').then(res => res.text()).then(data => {
+        document.getElementById('sidebar-container').innerHTML = data;
+        if (window.lucide) lucide.createIcons();
+
+        const currentPath = window.location.pathname;
+        document.querySelectorAll('[data-nav-link]').forEach(link => {
+            if (currentPath.includes(link.getAttribute('href'))) {
+                link.classList.add('bg-[#10b981]', 'shadow-xl'); 
+                link.classList.remove('text-white/70', 'text-white');
+                link.classList.add('text-[#062621]', 'font-bold');
+                const icon = link.querySelector('i');
+                if (icon) icon.setAttribute('stroke', '#062621');
+            }
+        });
+    });
+    
+    function closeModal(id) { 
+        document.getElementById(id)?.classList.add('hidden'); 
+    }
+    
+    // Low stock popup handlers
+    document.getElementById('openLowStockPopupBtn')?.addEventListener('click', () => {
+        openLowStockPopupModal();
+    });
+    
+    document.getElementById('closeLowStockPopupBtn')?.addEventListener('click', () => {
+        closeLowStockPopupModal();
+    });
+    
+    // Delete modal handlers
+    document.getElementById('cancelDeleteBtn')?.addEventListener('click', () => {
+        closeModal('deleteConfirmModal');
+    });
+    
+    document.getElementById('closeDeleteModalBtn')?.addEventListener('click', () => {
+        closeModal('deleteConfirmModal');
+    });
+    
+    // Low stock popup handlers
+    document.getElementById('openLowStockPopupBtn')?.addEventListener('click', () => {
+        openLowStockPopupModal();
+    });
+    
+    document.getElementById('closeLowStockPopupBtn')?.addEventListener('click', () => {
+        closeLowStockPopupModal();
+    });
+</script>
+</body>
+</html>

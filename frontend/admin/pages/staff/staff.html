@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Management | Yaantra Admin</title>
+    
+   
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="../../../assets/css/custom.css">
+    <link rel="stylesheet" href="../../../assets/css/tailwind.css">
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            letter-spacing: -0.02em;
+            background-color: #f8faf9;
+        }
+        
+        .ts-alert-success { background-color: #ecfdf5; color: #065f46; border: 1px solid #10b981; padding: 1rem; border-radius: 1rem; font-weight: 700; }
+        .ts-alert-error { background-color: #fef2f2; color: #991b1b; border: 1px solid #ef4444; padding: 1rem; border-radius: 1rem; font-weight: 700; }
+
+       
+        [data-nav-link].bg-white svg {
+            color: #062621 !important;
+            stroke: #062621 !important;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen text-[#062621]">
+
+<!-- Auth Guard -->
+<script>
+    const token = localStorage.getItem('token');
+    const userRole = localStorage.getItem('userRole');
+    if (!token || userRole !== 'Admin') {
+        window.location.href = '/frontend/auth/login.html?message=Login First';
+    }
+</script>
+
+<!-- Sidebar Container -->
+<div id="sidebar-container"></div>
+
+<!-- ================= MAIN CONTENT ================= -->
+<div class="md:ml-64 min-h-screen transition-all duration-300">
+    
+    <!-- TOP HEADER -->
+    <header class="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-100 px-8 py-5 flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-extrabold text-[#062621] tracking-tighter uppercase leading-none">Staff Management</h1>
+            <p class="text-[10px] text-gray-400 font-bold tracking-widest uppercase opacity-70 mt-1">Registry of all internal personnel.</p>
+        </div>
+        
+        <div class="flex items-center gap-4">
+            <button onclick="toggleModal('staffModal', true)" class="bg-[#062621] text-white px-5 py-2.5 rounded-xl font-bold text-[11px] uppercase tracking-widest flex items-center gap-2 hover:opacity-90 transition shadow-lg">
+                <i data-lucide="user-plus" class="w-4 h-4"></i>
+                Register Personnel
+            </button>
+            <div class="w-10 h-10 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-[10px] font-bold text-[#062621]">AD</div>
+        </div>
+    </header>
+
+    <div class="p-8 space-y-8 max-w-[1600px] mx-auto">
+        
+        <!-- SEARCH BAR AREA -->
+        <div class="relative group">
+            <i data-lucide="search" class="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300 group-focus-within:text-emerald-500 transition"></i>
+            <input id="searchInput" type="text" placeholder="Search staff records..." 
+                class="w-full bg-white border-none shadow-sm rounded-2xl py-5 pl-14 pr-6 focus:ring-2 focus:ring-emerald-500/20 outline-none font-medium text-sm transition">
+        </div>
+
+        <!-- MAIN ALERT BOX -->
+        <div id="alertBox" class="hidden"></div>
+
+        <!-- TABLE SECTION -->
+        <div class="bg-white rounded-[2.5rem] shadow-sm border border-white overflow-hidden">
+            <div class="px-8 py-6 flex items-center justify-between border-b border-gray-50">
+                <h2 class="text-base font-bold text-[#062621] uppercase tracking-tight">Personnel Registry</h2>
+                <button onclick="loadStaff(1)" class="text-gray-400 hover:text-emerald-500 transition">
+                    <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-[#062621] text-white/50 text-[10px] uppercase tracking-[0.2em]">
+                        <tr>
+                            <th class="px-8 py-5 font-bold">S.N</th>
+                            <th class="px-8 py-5 font-bold">Profile</th>
+                            <th class="px-8 py-5 font-bold">Full Name</th>
+                            <th class="px-8 py-5 font-bold">Email Address</th>
+                            <th class="px-8 py-5 font-bold">Contact</th>
+                            <th class="px-8 py-5 font-bold text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="staffTable" class="divide-y divide-gray-50 text-sm">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- PAGINATION -->
+            <div class="flex justify-between items-center px-10 py-6 bg-gray-50/50 border-t border-gray-100">
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Page Navigation</p>
+                <div class="flex items-center gap-2">
+                    <button id="prevBtn" onclick="prevPage()" class="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-gray-100 hover:bg-emerald-50 transition text-gray-400 disabled:opacity-30">
+                        <i data-lucide="chevron-left" class="w-5 h-5"></i>
+                    </button>
+                    <div id="paginationNumbers" class="flex gap-2"></div>
+                    <button id="nextBtn" onclick="nextPage()" class="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-gray-100 hover:bg-emerald-50 transition text-gray-400 disabled:opacity-30">
+                        <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ================= MODALS ================= -->
+
+<!-- ADD STAFF MODAL -->
+<div id="staffModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm hidden p-4">
+    <div class="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
+        <div class="bg-[#062621] p-8 flex justify-between items-center">
+            <h2 class="text-white font-extrabold uppercase tracking-[0.2em] text-xs">Register New Staff</h2>
+            <button onclick="toggleModal('staffModal', false)" class="text-white/50 hover:text-white transition text-2xl font-light">&times;</button>
+        </div>
+        <form id="staffRegForm" class="p-10 space-y-6" enctype="multipart/form-data">
+            <div id="staffFormAlertBox" class="hidden"></div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 text-left">First Name</label>
+                    <input type="text" id="sFirstName" class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-500/20 outline-none text-sm font-medium" required>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 text-left">Last Name</label>
+                    <input type="text" id="sLastName" class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-500/20 outline-none text-sm font-medium" required>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 text-left">Email Address</label>
+                    <input type="email" id="sEmail" class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-500/20 outline-none text-sm font-medium" required>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 text-left">Phone Number</label>
+                    <input type="tel" id="sPhone" class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-500/20 outline-none text-sm font-medium" required>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 text-left">Access Password</label>
+                    <input type="password" id="sPassword" class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-500/20 outline-none text-sm font-medium" required>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 text-left">Profile Avatar</label>
+                    <input type="file" id="sProfilePicture" accept="image/*" onchange="displayFileName(this)" class="w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-black file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer">
+                </div>
+            </div>
+            <div>
+                <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 text-left">Address</label>
+                <textarea id="sAddress" rows="2" class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-500/20 outline-none text-sm font-medium resize-none"></textarea>
+            </div>
+            <div class="flex gap-3 pt-6 border-t border-gray-50">
+                <button type="button" onclick="registerStaffByAdmin()" class="flex-1 bg-[#062621] text-white py-4 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] hover:opacity-95 transition">Register Member</button>
+                <button type="button" onclick="toggleModal('staffModal', false)" class="flex-1 bg-gray-100 text-gray-400 py-4 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] hover:bg-gray-200 transition">Discard</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- VIEW MODAL -->
+<div id="viewModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm hidden p-4">
+    <div class="bg-white w-full max-w-sm rounded-[3rem] shadow-2xl p-10 text-center relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-24 bg-[#062621]"></div>
+        <button onclick="closeModal('viewModal')" class="absolute top-6 right-6 text-white/50 hover:text-white transition z-10"><i data-lucide="x-circle"></i></button>
+        
+        <div class="relative mt-8">
+            <img id="vProfilePic" src="" class="w-24 h-24 rounded-full mx-auto border-4 border-white shadow-xl object-cover mb-4">
+            <h2 id="vName" class="text-xl font-extrabold text-[#062621] uppercase tracking-tighter">Staff Name</h2>
+            <p class="text-[9px] bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full inline-block font-black uppercase tracking-widest mt-2 border border-emerald-100">Verified Personnel</p>
+            
+            <div class="mt-10 space-y-4 text-left bg-gray-50/50 p-6 rounded-[2rem] border border-gray-100">
+                <div class="flex flex-col"><span class="text-[9px] font-black text-gray-300 uppercase tracking-widest">Email Address</span><span id="vEmail" class="text-sm font-bold text-[#062621]"></span></div>
+                <div class="flex flex-col mt-4"><span class="text-[9px] font-black text-gray-300 uppercase tracking-widest">Primary Contact</span><span id="vPhone" class="text-sm font-bold text-[#062621]"></span></div>
+                <div class="flex flex-col mt-4"><span class="text-[9px] font-black text-gray-300 uppercase tracking-widest">Home Address</span><span id="vAddress" class="text-sm font-bold text-[#062621]"></span></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- EDIT STAFF MODAL -->
+<div id="editModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm hidden p-4">
+    <div class="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
+        <div class="bg-[#062621] p-8 flex justify-between items-center">
+            <h2 class="text-white font-extrabold uppercase tracking-[0.2em] text-xs">Edit Personnel Record</h2>
+            <button onclick="closeModal('editModal')" class="text-white/50 hover:text-white transition text-2xl font-light">&times;</button>
+        </div>
+        <form id="editStaffForm" class="p-10 space-y-6">
+            <input type="hidden" id="editStaffId">
+            <div id="staffEditFormAlertBox" class="hidden"></div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+                <div>
+                    <label class="block text-[10px] font-black text-gray-400 uppercase mb-2">First Name</label>
+                    <input type="text" id="eFirstName" class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 text-sm font-medium outline-none">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black text-gray-400 uppercase mb-2">Last Name</label>
+                    <input type="text" id="eLastName" class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 text-sm font-medium outline-none">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black text-gray-400 uppercase mb-2">Email</label>
+                    <input type="email" id="eEmail" class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 text-sm font-medium outline-none">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black text-gray-400 uppercase mb-2">Phone</label>
+                    <input type="tel" id="ePhone" class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 text-sm font-medium outline-none">
+                </div>
+            </div>
+
+            <div class="text-left">
+                <label class="block text-[10px] font-black text-gray-400 uppercase mb-2">Address</label>
+                <input type="text" id="eAddress" class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 text-sm font-medium outline-none">
+            </div>
+
+            <div class="flex items-center gap-6 pt-4 border-t border-gray-50">
+                <div id="existingProfilePictureRow" class="hidden">
+                    <img id="eProfilePic" src="" class="w-16 h-16 rounded-full object-cover border-2 border-emerald-100 shadow-sm">
+                </div>
+                <div class="flex-1 text-left">
+                    <label class="block text-[10px] font-black text-gray-400 uppercase mb-2">Update Avatar</label>
+                    <input type="file" id="eProfilePicture" accept="image/*" onchange="displayEditFileName(this)" class="w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-black file:bg-emerald-50 file:text-emerald-700">
+                </div>
+            </div>
+
+            <div class="flex gap-3 pt-4">
+                <button type="button" onclick="submitStaffUpdate()" class="flex-1 bg-[#062621] text-white py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest hover:opacity-95 transition">Update Records</button>
+                <button type="button" onclick="closeModal('editModal')" class="flex-1 bg-gray-100 text-gray-400 py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest hover:bg-gray-200 transition">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- DELETE MODAL -->
+<div id="deleteConfirmModal" class="fixed inset-0 z-[110] flex items-center justify-center bg-black/50 backdrop-blur-sm hidden p-4">
+    <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-sm p-10 flex flex-col items-center">
+        <div class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mb-6">
+            <i data-lucide="trash-2" class="w-8 h-8"></i>
+        </div>
+        <h2 class="text-xl font-extrabold text-[#062621] text-center">Terminate Record?</h2>
+        <p class="mt-2 text-gray-400 text-sm text-center mb-8" id="deleteConfirmMessage">Are you sure?</p>
+        <div class="flex gap-3 w-full">
+            <button id="cancelDeleteBtn" onclick="closeDeleteConfirmModal()" class="flex-1 py-4 bg-gray-100 text-gray-400 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-gray-200 transition">No</button>
+            <button id="confirmDeleteBtn" onclick="confirmDelete()" class="flex-1 py-4 bg-red-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-red-700 transition shadow-lg shadow-red-200">Delete</button>
+        </div>
+    </div>
+</div>
+
+<script src="../../js/staff.js"></script>
+<script>
+    // SIDEBAR INJECTION
+    fetch('/frontend/admin/includes/sidebar-admin.html')
+        .then(res => res.text())
+        .then(data => {
+            document.getElementById('sidebar-container').innerHTML = data;
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+
+            const currentPath = window.location.pathname;
+            document.querySelectorAll('[data-nav-link]').forEach(link => {
+                if (currentPath.includes(link.getAttribute('href'))) {
+                    
+                    link.classList.add('bg-[#10b981]', 'shadow-xl');
+                    
+                   
+                    link.classList.remove('text-white/70', 'text-white');
+                    link.classList.add('text-[#062621]', 'font-bold');
+                    
+                    
+                    const icon = link.querySelector('i');
+                    if (icon) {
+                        icon.setAttribute('stroke', '#062621');
+                    }
+                }
+            });
+        });
+
+    function toggleModal(id, show) {
+        const modal = document.getElementById(id);
+        if (show) modal.classList.remove('hidden');
+        else modal.classList.add('hidden');
+    }
+    function closeModal(id) { toggleModal(id, false); }
+</script>
+
+</body>
+</html>

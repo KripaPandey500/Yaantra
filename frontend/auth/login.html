@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yaantra | Login</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/custom.css">
+    
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        /* Minimalist Select arrow */
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.2rem center;
+            background-size: 1em;
+        }
+    </style>
+</head>
+<body class="bg-[#dce1e0] min-h-screen flex items-center justify-center p-6">
+
+    <!-- Compact Card Container  -->
+    <div class="relative flex flex-col md:flex-row w-full max-w-[780px] h-auto md:h-[500px] bg-white rounded-[2.5rem] overflow-hidden shadow-2xl">
+        
+        <!-- Small X Close Button -->
+        <button onclick="window.history.back()" class="absolute top-6 right-8 text-gray-400 hover:text-gray-600 transition-colors z-20">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+
+        <!-- Left Sidebar  -->
+        <div class="w-full md:w-[40%] bg-[#062621] flex flex-col items-center justify-center p-8 text-center">
+            
+            <div class="mb-4">
+                <img src="../assets/images/Logo/logo.png" 
+                     alt="Yaantra Logo" 
+                     class="w-48 h-auto object-contain">
+            </div>
+            <p class="text-white opacity-50 text-[9px] tracking-[0.3em] uppercase font-bold">
+Yaantra Login            </p>
+        </div>
+
+        <!-- Right Form Area  -->
+        <div class="flex-1 p-8 md:p-12 flex flex-col justify-center bg-white">
+            
+            <header class="mb-8">
+                <h2 class="text-[1.8rem] font-bold text-center text-[#062621] leading-tight tracking-tight">Login</h2>
+            </header>
+
+            <!-- Error Message -->
+            <div id="errorMessage" class="hidden mb-4 text-center text-sm"></div>
+
+            <form class="space-y-6">
+                <!-- Email -->
+                <div class="flex flex-col">
+                    <label class="text-[9px] font-bold uppercase text-[#062621] tracking-widest mb-1">Email Address</label>
+                    <input type="email" id="email" placeholder="Enter your email" autocomplete="email"
+                        class="border-b border-gray-200 py-1.5 focus:border-[#062621] outline-none transition-all text-sm placeholder-gray-300 bg-transparent">
+                </div>
+
+                <!-- Password -->
+                <div class="flex flex-col">
+                    <label class="text-[9px] font-bold uppercase text-[#062621] tracking-widest mb-1">Password</label>
+                    <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password"
+                        class="border-b border-gray-200 py-1.5 focus:border-[#062621] outline-none transition-all text-sm placeholder-gray-300 bg-transparent">
+                </div>
+
+                <!-- Role -->
+                <div class="flex flex-col">
+                    <label class="text-[9px] font-bold uppercase text-[#062621] tracking-widest mb-1">Role</label>
+                    <select id="role" class="border-b border-gray-200 py-1.5 focus:border-[#062621] outline-none transition-all text-sm bg-transparent cursor-pointer">
+                        <option value="">Select your role</option>
+                        <option value="Customer">Customer</option>
+                        <option value="Staff">Staff</option>
+                        <option value="Admin">Admin</option>
+                    </select>
+                </div>
+                <div class="pt-2">
+                    <button type="button" onclick="login()" 
+                        class="w-full bg-[#062621] text-white py-2.5 rounded-full font-bold text-[11px] tracking-widest hover:bg-[#041a17] transition-all duration-300 shadow-md hover:-translate-y-px hover:scale-[1.02] hover:shadow-lg active:scale-95">
+                         Login
+                    </button>
+                </div>
+            </form>
+            
+            <!-- Links Footer -->
+            <div class="mt-10 text-center">
+                <div class="text-[12px] font-bold text-[#062621] flex items-center justify-center gap-2 whitespace-nowrap">
+                    <p class="text-gray-400 text-[10px] uppercase tracking-tighter font-medium mr-2">Don't have an account?</p>
+                    <a href="register-customer.html" class="hover:underline">Customer</a>
+                    <span class="opacity-20 font-normal">|</span>
+                    <a href="register-staff.html" class="hover:underline">Staff</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../assets/js/alert.js"></script>
+    <script src="../assets/js/login.js"></script>
+
+    <!-- Display Registration Success Message -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Display message from URL parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const message = urlParams.get('message');
+            const messageType = urlParams.get('type') || 'error';
+            
+            if (message) {
+                const errorMsg = document.getElementById('errorMessage');
+                errorMsg.textContent = message;
+                
+                if (messageType === 'success') {
+                    errorMsg.className = 'mb-4 text-center text-sm ts-alert-success';
+                } else {
+                    errorMsg.className = 'mb-4 text-center text-sm ts-alert-error';
+                }
+                errorMsg.classList.remove('hidden');
+            }
+
+            const successMsg = sessionStorage.getItem('registrationSuccess');
+            if (successMsg) {
+                const errorMsg = document.getElementById('errorMessage');
+                errorMsg.textContent = successMsg;
+                errorMsg.className = 'mb-4 text-center text-sm ts-alert-success';
+                errorMsg.classList.remove('hidden');
+                sessionStorage.removeItem('registrationSuccess');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,358 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>User Dashboard | Yaantra</title>
+	
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+	
+	<script src="https://cdn.tailwindcss.com"></script>
+	<script src="https://unpkg.com/lucide@latest"></script>
+	<link rel="stylesheet" href="/frontend/assets/css/custom.css">
+	<link rel="stylesheet" href="/frontend/assets/css/tailwind.css">
+
+	<style>
+		body {
+			font-family: 'Plus Jakarta Sans', sans-serif;
+			letter-spacing: -0.02em;
+			background-color: #f8faf9;
+		}
+	</style>
+</head>
+
+<body class="min-h-screen text-[#062621]">
+
+<!-- Global logout functions  -->
+<script>
+window.showLogoutModal = function() { 
+	const modal = document.getElementById('logoutModal');
+	if (modal) modal.classList.remove('hidden'); 
+}
+window.closeLogoutModal = function() { 
+	const modal = document.getElementById('logoutModal');
+	if (modal) modal.classList.add('hidden'); 
+}
+window.logout = function() {
+	localStorage.removeItem('token');
+	localStorage.removeItem('userEmail');
+	localStorage.removeItem('firstName');
+	localStorage.removeItem('lastName');
+	localStorage.removeItem('userRole');
+	localStorage.removeItem('profilePic');
+	window.location.href = '/frontend/auth/login.html';
+}
+</script>
+
+<div id="sidebar-container"></div>
+
+<div class="md:ml-64 min-h-screen pb-10 transition-all duration-300">
+
+	<!-- TOP HEADER -->
+	<header class="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-100 px-8 py-5 flex items-center justify-between">
+		<div>
+			<h1 class="text-xl font-extrabold text-[#062621] tracking-tighter uppercase">Dashboard</h1>
+			<p id="welcomeText" class="text-[10px] text-gray-400 font-bold tracking-widest uppercase opacity-70 mt-1">Your personal overview</p>
+		</div>
+		<a href="pages/profile/user-profile.html" class="bg-[#062621] text-white px-6 py-3 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] transition hover:opacity-95 shadow-xl shadow-emerald-950/10 flex items-center gap-2">
+			<i data-lucide="user" class="w-5 h-5"></i>
+			<span>My Profile</span>
+		</a>
+	</header>
+
+	<div class="p-8 space-y-8 max-w-[1600px] mx-auto">
+
+		<!-- STAT CARDS -->
+		<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+			
+			<!-- Total Orders -->
+			<div class="bg-white rounded-[2rem] shadow-sm p-7 flex items-center gap-5 border border-white hover:shadow-lg hover:scale-[1.01] transition-all">
+				<div class="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center flex-shrink-0 text-emerald-600">
+					<i data-lucide="shopping-cart" class="w-6 h-6"></i>
+				</div>
+				<div class="flex-1">
+					<p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Total Orders</p>
+					<p id="statOrders" class="text-3xl font-extrabold text-[#062621]">0</p>
+				</div>
+			</div>
+
+			<!-- Bookings -->
+			<div class="bg-white rounded-[2rem] shadow-sm p-7 flex items-center gap-5 border border-white hover:shadow-lg hover:scale-[1.01] transition-all">
+				<div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center flex-shrink-0 text-blue-600">
+					<i data-lucide="calendar" class="w-6 h-6"></i>
+				</div>
+				<div class="flex-1">
+					<p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Bookings</p>
+					<p id="statBookings" class="text-3xl font-extrabold text-[#062621]">0</p>
+				</div>
+			</div>
+
+			<!-- Part Requests -->
+			<div class="bg-white rounded-[2rem] shadow-sm p-7 flex items-center gap-5 border border-white hover:shadow-lg hover:scale-[1.01] transition-all">
+				<div class="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center flex-shrink-0 text-purple-600">
+					<i data-lucide="package" class="w-6 h-6"></i>
+				</div>
+				<div class="flex-1">
+					<p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Part Requests</p>
+					<p id="statRequests" class="text-3xl font-extrabold text-[#062621]">0</p>
+				</div>
+			</div>
+
+			<!-- Completed Orders -->
+			<div class="bg-white rounded-[2rem] shadow-sm p-7 flex items-center gap-5 border border-white hover:shadow-lg hover:scale-[1.01] transition-all">
+				<div class="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center flex-shrink-0 text-orange-600">
+					<i data-lucide="check-circle" class="w-6 h-6"></i>
+				</div>
+				<div class="flex-1">
+					<p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Completed</p>
+					<p id="statCompleted" class="text-3xl font-extrabold text-[#062621]">0</p>
+				</div>
+			</div>
+
+		</section>
+
+		<!-- RECENT ORDERS + RECENT BOOKINGS -->
+		<section class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+
+			<!-- Recent Orders -->
+			<div class="bg-white rounded-[2.5rem] shadow-sm border border-white overflow-hidden">
+				<div class="px-8 py-6 flex items-center justify-between border-b border-gray-50">
+					<h2 class="text-base font-bold text-[#062621] uppercase tracking-tight">Recent Orders</h2>
+					<a href="pages/orderHistory/order.html" class="text-[10px] bg-[#062621] text-white px-4 py-2 rounded-xl font-bold uppercase tracking-widest hover:opacity-90 transition">View all</a>
+				</div>
+				<div id="recentOrdersList" class="p-6 space-y-3">
+					<p class="text-sm text-gray-400 text-center py-4">Loading…</p>
+				</div>
+			</div>
+
+			<!-- Recent Bookings -->
+			<div class="bg-white rounded-[2.5rem] shadow-sm border border-white overflow-hidden">
+				<div class="px-8 py-6 flex items-center justify-between border-b border-gray-50">
+					<h2 class="text-base font-bold text-[#062621] uppercase tracking-tight">Recent Bookings</h2>
+					<a href="pages/bookAppoinment/bookings.html" class="text-[10px] bg-[#062621] text-white px-4 py-2 rounded-xl font-bold uppercase tracking-widest hover:opacity-90 transition">View all</a>
+				</div>
+				<div id="recentBookingsList" class="p-6 space-y-3">
+					<p class="text-sm text-gray-400 text-center py-4">Loading…</p>
+				</div>
+			</div>
+
+		</section>
+
+		<!-- RECENT PART REQUESTS -->
+		<section class="bg-white rounded-[2.5rem] shadow-sm border border-white overflow-hidden">
+			<div class="px-8 py-6 flex items-center justify-between border-b border-gray-50">
+				<h2 class="text-base font-bold text-[#062621] uppercase tracking-tight">Recent Part Requests</h2>
+				<a href="pages/request/request.html" class="text-[10px] bg-[#062621] text-white px-4 py-2 rounded-xl font-bold uppercase tracking-widest hover:opacity-90 transition">View all</a>
+			</div>
+			<div id="recentRequestsList" class="p-6 overflow-x-auto">
+				<p class="text-sm text-gray-400 text-center py-4">Loading…</p>
+			</div>
+		</section>
+
+	</div>
+</div>
+
+<script>
+// Global logout functions available to all pages
+window.showLogoutModal = function() { 
+	document.getElementById('logoutModal').classList.remove('hidden'); 
+}
+window.closeLogoutModal = function() { 
+	document.getElementById('logoutModal').classList.add('hidden'); 
+}
+window.logout = function() {
+	localStorage.removeItem('token');
+	localStorage.removeItem('userEmail');
+	localStorage.removeItem('firstName');
+	localStorage.removeItem('lastName');
+	localStorage.removeItem('userRole');
+	localStorage.removeItem('profilePic');
+	window.location.href = '/frontend/auth/login.html';
+}
+
+function escapeHtml(text) {
+	if (text == null) return '-';
+	return String(text)
+		.replace(/&/g, '&amp;')
+		.replace(/</g, '&lt;')
+		.replace(/>/g, '&gt;')
+		.replace(/"/g, '&quot;')
+		.replace(/'/g, '&#39;');
+}
+
+function statusBadge(status) {
+	const normalized = (status || '').toLowerCase();
+	const map = {
+		pending: 'bg-amber-50 text-amber-600 border border-amber-100',
+		confirmed: 'bg-blue-50 text-blue-600 border border-blue-100',
+		completed: 'bg-emerald-50 text-emerald-600 border border-emerald-100',
+		cancelled: 'bg-red-50 text-red-600 border border-red-100',
+		shipped: 'bg-purple-50 text-purple-600 border border-purple-100',
+		delivered: 'bg-emerald-50 text-emerald-600 border border-emerald-100',
+		paid: 'bg-emerald-50 text-emerald-600 border border-emerald-100',
+		unpaid: 'bg-red-50 text-red-600 border border-red-100'
+	};
+	const css = map[normalized] || 'bg-gray-50 text-gray-400 border border-gray-100';
+	return `<span class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${css}">${escapeHtml(status || 'Unknown')}</span>`;
+}
+
+function formatDate(value) {
+	if (!value) return '—';
+	const date = new Date(value);
+	if (Number.isNaN(date.getTime())) return '—';
+	return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+const API = 'http://localhost:5033/api';
+
+async function loadDashboard() {
+	const token = localStorage.getItem('token');
+	if (!token) {
+		window.location.href = '/frontend/auth/login.html';
+		return;
+	}
+
+	const firstName = localStorage.getItem('firstName') || '';
+	const lastName = localStorage.getItem('lastName') || '';
+	const name = (firstName + ' ' + lastName).trim();
+	const welcomeEl = document.getElementById('welcomeText');
+	if (name && welcomeEl) {
+		welcomeEl.textContent = `Welcome back, ${name}!`;
+	}
+
+	const headers = { 'Authorization': `Bearer ${token}` };
+
+	const [ordersRes, bookingsRes, requestsRes] = await Promise.allSettled([
+		fetch(`${API}/Orders/user-orders`, { headers }),
+		fetch(`${API}/BookingAppointment/bookings`, { headers }),
+		fetch(`${API}/PartRequest/my`, { headers })
+	]);
+
+	// ---- ORDERS ----
+	let orders = [];
+	if (ordersRes.status === 'fulfilled' && ordersRes.value.ok) {
+		orders = await ordersRes.value.json();
+	}
+	document.getElementById('statOrders').textContent = orders.length;
+	document.getElementById('statCompleted').textContent = orders.filter(o => o.status?.toLowerCase() === 'completed').length;
+
+	const recentOrdersEl = document.getElementById('recentOrdersList');
+	if (orders.length === 0) {
+		recentOrdersEl.innerHTML = '<p class="text-sm text-gray-400 text-center py-6">No orders yet.</p>';
+	} else {
+		recentOrdersEl.innerHTML = orders.slice(0, 5).map(o => `
+			<div class="flex items-center justify-between px-5 py-4 rounded-2xl border border-gray-100 bg-gray-50 hover:bg-white hover:border-emerald-100 transition-all duration-200">
+				<div class="flex items-center gap-3">
+					<div class="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center flex-shrink-0">
+						<i data-lucide="shopping-bag" class="w-5 h-5 text-emerald-600"></i>
+					</div>
+					<div>
+						<p class="text-sm font-bold text-[#062621]">${escapeHtml(o.orderNumber || '#' + o.id)}</p>
+						<p class="text-xs text-gray-400 font-medium">${formatDate(o.orderDate)}</p>
+					</div>
+				</div>
+				<div class="flex items-center gap-3">
+					${statusBadge(o.status)}
+					<span class="text-xs font-black text-emerald-600">Rs ${(o.grandTotal ?? o.totalAmount ?? 0).toLocaleString()}</span>
+				</div>
+			</div>`).join('');
+	}
+
+	// ---- BOOKINGS ----
+	let bookings = [];
+	if (bookingsRes.status === 'fulfilled' && bookingsRes.value.ok) {
+		bookings = await bookingsRes.value.json();
+	}
+	document.getElementById('statBookings').textContent = bookings.length;
+
+	const recentBookingsEl = document.getElementById('recentBookingsList');
+	if (bookings.length === 0) {
+		recentBookingsEl.innerHTML = '<p class="text-sm text-gray-400 text-center py-6">No bookings yet.</p>';
+	} else {
+		recentBookingsEl.innerHTML = bookings.slice(0, 5).map(b => `
+			<div class="flex items-center justify-between px-5 py-4 rounded-2xl border border-gray-100 bg-gray-50 hover:bg-white hover:border-blue-100 transition-all duration-200">
+				<div class="flex items-center gap-3">
+					<div class="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
+						<i data-lucide="calendar-check" class="w-5 h-5 text-blue-600"></i>
+					</div>
+					<div>
+						<p class="text-sm font-bold text-[#062621]">${escapeHtml(b.serviceType || 'Service')}</p>
+						<p class="text-xs text-gray-400 font-medium">${escapeHtml(b.vehicleName || '—')} · ${formatDate(b.serviceDate || b.bookingDate)}</p>
+					</div>
+				</div>
+				${statusBadge(b.status)}
+			</div>`).join('');
+	}
+
+	// ---- PART REQUESTS ----
+	let requests = [];
+	if (requestsRes.status === 'fulfilled' && requestsRes.value.ok) {
+		requests = await requestsRes.value.json();
+	}
+	document.getElementById('statRequests').textContent = requests.length;
+
+	const recentRequestsEl = document.getElementById('recentRequestsList');
+	if (requests.length === 0) {
+		recentRequestsEl.innerHTML = '<p class="text-sm text-gray-400 text-center py-6">No part requests yet.</p>';
+	} else {
+		recentRequestsEl.innerHTML = `
+			<div class="overflow-x-auto">
+				<table class="w-full text-left">
+					<thead class="bg-[#062621]/[0.02] text-[10px] text-gray-400 uppercase tracking-[0.2em] border-y border-gray-50">
+						<tr>
+							<th class="px-6 py-4 font-bold">Part Name</th>
+							<th class="px-6 py-4 font-bold text-center">Quantity</th>
+							<th class="px-6 py-4 font-bold text-right">Status</th>
+						</tr>
+					</thead>
+					<tbody class="divide-y divide-gray-50">
+						${requests.slice(0, 5).map(r => `
+							<tr class="hover:bg-gray-50 transition">
+								<td class="px-6 py-4 text-sm font-bold text-[#062621]">${escapeHtml(r.partName)}</td>
+								<td class="px-6 py-4 text-sm font-medium text-gray-600 text-center">${r.quantity}</td>
+								<td class="px-6 py-4 text-right">${statusBadge(r.status)}</td>
+							</tr>`).join('')}
+					</tbody>
+				</table>
+			</div>`;
+	}
+
+	// Initialize Lucide icons
+	if (typeof lucide !== 'undefined') {
+		lucide.createIcons();
+	}
+}
+
+// Sidebar Initialization
+function initUserSidebar(container) {
+	if (!container) return;
+	const currentPath = window.location.pathname.replace(/\/+$/, '');
+	container.querySelectorAll('[data-nav-link]').forEach((link) => {
+		const linkPath = new URL(link.href, window.location.origin).pathname.replace(/\/+$/, '');
+		if (linkPath === currentPath) {
+			link.classList.add('bg-emerald-600', 'shadow-lg', 'text-white', 'font-semibold');
+			link.classList.remove('text-white/60', 'hover:bg-white/10');
+		}
+	});
+}
+
+fetch('includes/sidebar-user.html')
+	.then(res => res.text())
+	.then(data => {
+		const sidebarContainer = document.getElementById('sidebar-container');
+		sidebarContainer.innerHTML = data;
+		if (typeof lucide !== 'undefined') {
+			lucide.createIcons();
+		}
+		initUserSidebar(sidebarContainer);
+	});
+
+document.addEventListener('DOMContentLoaded', () => {
+	loadDashboard();
+});
+</script>
+</body>
+</html>

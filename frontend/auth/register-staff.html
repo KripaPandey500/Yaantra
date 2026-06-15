@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Registration - Yaantra</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/custom.css">
+    
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.2rem center;
+            background-size: 1em;
+        }
+    </style>
+</head>
+<body class="bg-[#dce1e0] min-h-screen flex items-center justify-center p-6">
+
+    <!-- Compact Card Container -->
+    <div class="relative flex flex-col md:flex-row w-full max-w-[1000px] h-auto md:h-[800px] bg-white rounded-[2.5rem] overflow-hidden shadow-2xl">
+        
+        <!-- Small X Close Button -->
+        <button onclick="window.location.href='/'" class="absolute top-6 right-8 text-gray-400 hover:text-gray-600 transition-colors z-20">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+
+        <!-- Left Sidebar -->
+        <div class="w-full md:w-[35%] bg-[#062621] flex flex-col items-center justify-center p-8 text-center">
+            <!-- Logo -->
+            <div class="mb-4">
+                <img src="../assets/images/Logo/logo.png" 
+                     alt="Yaantra Logo" 
+                     class="w-40 h-auto object-contain">
+            </div>
+            <p class="text-white opacity-50 text-[9px] tracking-[0.3em] uppercase font-bold">
+                Staff Registration
+            </p>
+        </div>
+
+        <!-- Right Form Area -->
+        <div class="flex-1 p-8 md:p-10 flex flex-col justify-center bg-white overflow-y-auto max-h-[750px]">
+            
+            <header class="mb-6">
+                <h2 class="text-2xl font-bold text-center text-[#062621] leading-tight tracking-tight">Staff Registration</h2>
+            </header>
+
+            <!-- Alert Container -->
+            <div id="alertBox" class="hidden mb-4 text-center text-sm"></div>
+
+            <form id="staffForm" class="space-y-4" novalidate>
+                <!-- First Name & Last Name Row -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="flex flex-col">
+                        <label class="text-[9px] font-bold uppercase text-[#062621] tracking-widest mb-1">First Name</label>
+                        <input type="text" id="firstName" placeholder="John Doe" 
+                            class="border-b border-gray-200 py-1.5 focus:border-[#062621] outline-none transition-all text-sm placeholder-gray-300 bg-transparent" required>
+                    </div>
+                    <div class="flex flex-col">
+                        <label class="text-[9px] font-bold uppercase text-[#062621] tracking-widest mb-1">Last Name</label>
+                        <input type="text" id="lastName" placeholder="Smith" 
+                            class="border-b border-gray-200 py-1.5 focus:border-[#062621] outline-none transition-all text-sm placeholder-gray-300 bg-transparent" required>
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div class="flex flex-col">
+                    <label class="text-[9px] font-bold uppercase text-[#062621] tracking-widest mb-1">Email Address</label>
+                    <input type="email" id="email" placeholder="example@email.com" 
+                        class="border-b border-gray-200 py-1.5 focus:border-[#062621] outline-none transition-all text-sm placeholder-gray-300 bg-transparent" required>
+                </div>
+
+                <!-- Phone & Gender Row -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="flex flex-col">
+                        <label class="text-[9px] font-bold uppercase text-[#062621] tracking-widest mb-1">Phone</label>
+                        <input type="tel" id="phone" placeholder="+977 98XXXXXXXX" 
+                            class="border-b border-gray-200 py-1.5 focus:border-[#062621] outline-none transition-all text-sm placeholder-gray-300 bg-transparent" required>
+                    </div>
+                    <div class="flex flex-col">
+                        <label class="text-[9px] font-bold uppercase text-[#062621] tracking-widest mb-1">Gender</label>
+                        <select id="gender" class="border-b border-gray-200 py-1.5 focus:border-[#062621] outline-none transition-all text-sm bg-transparent cursor-pointer" required>
+                            <option value="" disabled selected>Select your gender</option>
+                            <option value="Female">Female</option>
+                            <option value="Male">Male</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Password -->
+                <div class="flex flex-col">
+                    <label class="text-[9px] font-bold uppercase text-[#062621] tracking-widest mb-1">Temporary Password</label>
+                    <input type="password" id="password" placeholder="Min. 8 characters" minlength="8"
+                        class="border-b border-gray-200 py-1.5 focus:border-[#062621] outline-none transition-all text-sm placeholder-gray-300 bg-transparent" required>
+                </div>
+
+                <!-- Date of Birth -->
+                <div class="flex flex-col">
+                    <label class="text-[9px] font-bold uppercase text-[#062621] tracking-widest mb-1">Date of Birth</label>
+                    <input type="date" id="dob" placeholder="DD/MM/YYYY"
+                        class="border-b border-gray-200 py-1.5 focus:border-[#062621] outline-none transition-all text-sm placeholder-gray-300 bg-transparent" required>
+                </div>
+
+                <!-- Profile Picture -->
+                <div class="flex flex-col">
+                    <label class="text-[9px] font-bold uppercase text-[#062621] tracking-widest mb-1">Profile Picture</label>
+                    <input type="file" id="profilePicture" accept="image/*" onchange="displayFileName(this)" class="border rounded-lg px-3 py-2 text-sm placeholder-gray-400">
+                    <div class="text-[10px] text-[#062621] font-semibold mt-2" id="fileNameDisplay"></div>
+                </div>
+
+                <!-- Address -->
+                <div class="flex flex-col">
+                    <label class="text-[9px] font-bold uppercase text-[#062621] tracking-widest mb-1">Address</label>
+                    <input type="text" id="address" placeholder="Street address, city, country" 
+                        class="border-b border-gray-200 py-1.5 focus:border-[#062621] outline-none transition-all text-sm placeholder-gray-300 bg-transparent" required>
+                </div>
+
+                <!-- Buttons -->
+                <div class="pt-4 flex flex-col gap-3">
+                    <button type="button" onclick="registerStaff()" 
+                        class="w-full bg-[#062621] text-white py-2.5 rounded-full font-bold text-[11px] tracking-widest hover:bg-[#041a17] transition-all duration-300 shadow-md hover:-translate-y-px hover:scale-[1.02] hover:shadow-lg active:scale-95">
+                        Register
+                    </button>
+                </div>
+            </form>
+            
+            <!-- Login Link -->
+            <div class="mt-6 text-center">
+                <p class="text-[12px] text-[#062621]">Already have an account? <a href="login.html" class="font-bold hover:underline">Login here</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        function displayFileName(input) {
+            const fileNameDisplay = document.getElementById('fileNameDisplay');
+            if (input.files && input.files[0]) {
+                fileNameDisplay.textContent = input.files[0].name;
+            } else {
+                fileNameDisplay.textContent = '';
+            }
+        }
+
+        function clearForm() {
+            document.getElementById('staffForm').reset();
+            document.getElementById('fileNameDisplay').textContent = '';
+            document.getElementById('gender').value = '';
+            const alertBox = document.getElementById('alertBox');
+            if (alertBox) {
+                alertBox.style.display = 'none';
+            }
+        }
+    </script>
+    <script src="../assets/js/alert.js"></script>
+    <script src="../assets/js/register-staff.js"></script>
+</body>
+</html>

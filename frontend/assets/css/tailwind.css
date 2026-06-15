@@ -1,0 +1,38 @@
+:root {
+  --color-primary: #0a2e26;        /* Deep Forest Green */
+  --color-primary-hover: #144d41;  /* Emerald Hover */
+  --color-secondary: #f8faf9;      /* Off-White */
+  --color-accent: #000000;         /* Black */
+  --color-accent-hover: #333333;   /* Dark Grey Hover */
+  --color-light: #ffffff;          /* Pure White */
+  --color-light-hover: #f1f5f4;    /* Very Light Grey-Green */
+}
+
+/* Primary Button: Dark Green background, White text */
+.btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-light);
+  transition: all 0.3s ease;
+}
+.btn-primary:hover {
+  background-color: var(--color-primary-hover);
+}
+
+.btn-accent {
+  background-color: var(--color-accent);
+  color: var(--color-light);
+  transition: all 0.3s ease;
+}
+.btn-accent:hover {
+  background-color: var(--color-accent-hover);
+}
+
+.btn-light {
+  background-color: var(--color-light);
+  color: var(--color-primary);
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+}
+.btn-light:hover {
+  background-color: var(--color-light-hover);
+}

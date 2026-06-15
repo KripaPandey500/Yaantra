@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yaantra | Sales Orders</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#062621',
+                        'primary-light': '#0a362f',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f0f2f1; }
+        .label-style { font-size: 10px; font-weight: 800; text-transform: uppercase; color: #062621; letter-spacing: 0.05em; margin-bottom: 0.5rem; display: block; }
+
+        /* Badge */
+        .badge-green  { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+        .badge-yellow { background: #fefce8; color: #854d0e; border: 1px solid #fef08a; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+        .badge-red    { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+        .badge-blue   { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+
+        /* Table */
+        .data-table th { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #9ca3af; padding: 1rem 1.5rem; background: #f9fafb; }
+        .data-table td { padding: 1rem 1.5rem; font-size: 0.8125rem; border-bottom: 1px solid #f3f4f6; }
+        .data-table tr:last-child td { border-bottom: none; }
+        .data-table tr:hover td { background: #f9fafb; }
+
+        /* Print */
+        @media print {
+            #sidebar-placeholder, header, .no-print { display: none !important; }
+            main { margin-left: 0 !important; }
+            body { background: white; }
+            .print-page { box-shadow: none !important; border: none !important; }
+        }
+
+        /* Skeleton loader */
+        .skeleton { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    </style>
+</head>
+<body class="flex min-h-screen">
+    <div id="sidebar-placeholder"></div>
+
+    <main class="ml-64 flex-1">
+
+        <!-- Header -->
+        <header class="bg-white/80 backdrop-blur-md p-6 flex justify-between items-center shadow-sm sticky top-0 z-10 border-b border-gray-100">
+            <div>
+                <h2 class="text-2xl font-bold text-primary">Sales Orders</h2>
+                <p class="text-xs text-gray-400">View and manage all sales orders and transactions.</p>
+            </div>
+            <div class="flex items-center gap-3 border-l pl-4">
+                <p class="text-sm font-bold text-primary" id="userName">Loading...</p>
+                <img id="userProfilePic" src="https://ui-avatars.com/api/?name=Staff" class="w-10 h-10 rounded-full border border-gray-200 object-cover">
+            </div>
+        </header>
+
+        <section class="p-10 space-y-6">
+
+            <!-- Search & Actions Bar -->
+            <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex items-center gap-4">
+                <div class="flex-1">
+                    <input type="text" id="searchBox" placeholder="Search by Order ID or Customer Name..." class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:border-primary text-sm" onkeyup="filterTable()">
+                </div>
+                <button onclick="loadOrders()" class="bg-primary text-white text-[10px] font-bold px-6 py-2.5 rounded-full uppercase tracking-widest hover:bg-primary-light transition-all shadow-lg flex items-center gap-2">
+                    <i data-lucide="refresh-cw" class="w-4 h-4"></i> Refresh
+                </button>
+            </div>
+
+            <!-- Orders Table -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse data-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Customer</th>
+                                <th>Amount</th>
+                                <th>Items</th>
+                                <th>Date</th>
+                                <th>Payment Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersTableBody">
+                            <tr>
+                                <td colspan="7" class="text-center py-12 text-gray-400">Loading orders...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Loading Indicator -->
+    <div id="loadingIndicator" style="display: none;" class="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl p-8 shadow-xl">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 border-4 border-gray-300 border-t-primary rounded-full animate-spin"></div>
+                <span class="font-bold text-primary">Loading...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Order Modal -->
+    <div id="viewOrderModal" style="display: none; position: fixed; inset: 0; z-index: 100; background: rgba(6,38,33,0.6); backdrop-filter: blur(4px); align-items: center; justify-content: center; padding: 1rem;">
+        <div class="bg-white w-full max-w-4xl" style="border-radius: 2.5rem; box-shadow: 0 20px 25px -5px rgba(6, 38, 33, 0.05); overflow: hidden; max-height: 90vh; overflow-y: auto; border: 1px solid rgba(16, 185, 129, 0.2);">
+            <div style="padding: 2rem; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: flex-start; position: sticky; top: 0; background: white; z-index: 10;">
+                <div>
+                    <h1 style="font-size: 1.25rem; font-weight: 900; color: #062621; text-transform: uppercase; letter-spacing: -0.02em; margin: 0;">Order Details</h1>
+                    <p style="font-size: 10px; color: #9ca3af; font-weight: bold; letter-spacing: 0.05em; text-transform: uppercase; margin-top: 0.5rem; margin-bottom: 0;">Review Your Order Information</p>
+                </div>
+                <button onclick="closeViewOrderModal()" style="color: #9ca3af; cursor: pointer; border: none; background: none; padding: 0; margin-left: 1rem; transition: color 0.2s;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 1.5rem; height: 1.5rem;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <div id="viewOrderModalBody" style="padding: 2rem;">
+                <div style="text-align: center; padding: 2rem 0; color: #9ca3af; font-style: italic; font-size: 0.875rem;">Loading...</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/staff.js"></script>
+    <script src="js/sales-orders.js"></script>
+</body>
+</html>

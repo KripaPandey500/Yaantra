@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yaantra | Customer Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#062621',
+                        'primary-light': '#0a362f',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f0f2f1; }
+        .boxed-input {
+            width: 100%; background-color: #f8fafc;
+            border: 1.5px solid #e2e8f0; border-radius: 0.75rem;
+            padding: 0.75rem 1rem; font-size: 0.875rem;
+            outline: none; transition: all 0.2s;
+        }
+        .boxed-input:focus { border-color: #062621; background-color: #fff; }
+        .label-style {
+            font-size: 10px; font-weight: 800; text-transform: uppercase;
+            color: #062621; letter-spacing: 0.05em; margin-bottom: 0.5rem; display: block;
+        }
+        .modal-overlay {
+            display: none; position: fixed; inset: 0; z-index: 100;
+            background: rgba(6,38,33,0.6); backdrop-filter: blur(4px);
+            align-items: center; justify-content: center; padding: 1rem;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-box {
+            background: white; width: 100%; max-width: 680px;
+            border-radius: 2.5rem; box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+            overflow: hidden; max-height: 90vh; overflow-y: auto;
+        }
+        .modal-header {
+            padding: 2rem 2rem 1rem; display: flex; justify-content: space-between;
+            align-items: flex-start; position: sticky; top: 0;
+            background: white; z-index: 10; border-bottom: 1px solid #f1f5f9;
+        }
+        .btn-primary {
+            background: #062621; color: white; padding: 1rem 1.5rem;
+            border-radius: 0.75rem; font-weight: 700; font-size: 0.875rem;
+            border: none; cursor: pointer; transition: all 0.2s; width: 100%;
+        }
+        .btn-primary:hover { background: #0a362f; }
+        .btn-outline {
+            background: transparent; color: #062621; padding: 1rem 2rem;
+            border-radius: 0.75rem; font-weight: 700; font-size: 0.875rem;
+            border: 1.5px solid #062621; cursor: pointer; transition: all 0.2s;
+        }
+        .btn-outline:hover { background: #f8fafc; }
+        .alert-success { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; border-radius: 0.75rem; padding: 0.75rem 1rem; font-size: 0.875rem; font-weight: 600; }
+        .alert-error   { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; border-radius: 0.75rem; padding: 0.75rem 1rem; font-size: 0.875rem; font-weight: 600; }
+    </style>
+</head>
+<body class="flex min-h-screen">
+
+    <div id="sidebar-placeholder"></div>
+
+    <main class="ml-64 flex-1">
+        <!-- Header -->
+        <header class="bg-white/80 backdrop-blur-md p-6 flex justify-between items-center shadow-sm sticky top-0 z-10 border-b border-gray-100">
+            <div>
+                <h2 class="text-2xl font-bold text-primary">Customer Management</h2>
+                <p class="text-xs text-gray-400">Register and manage system clients.</p>
+            </div>
+            <div class="flex items-center gap-6">
+                <button onclick="openCreateModal()" class="bg-primary text-white text-[10px] font-bold px-6 py-3 rounded-full uppercase tracking-widest hover:bg-primary-light transition-all shadow-lg flex items-center gap-2">
+                    <i data-lucide="user-plus" class="w-4 h-4"></i>
+                    Register New Customer
+                </button>
+                <div class="flex items-center gap-3 border-l pl-6">
+                    <div class="text-right">
+                        <p class="text-sm font-bold text-primary" id="userName">Loading...</p>
+                    </div>
+                    <img id="userProfilePic" src="https://ui-avatars.com/api/?name=Staff" class="w-10 h-10 rounded-full border border-gray-200 object-cover bg-white">
+                </div>
+            </div>
+        </header>
+
+        <section class="p-10 space-y-6">
+
+            <!-- Search Bar -->
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex gap-3 items-center flex-wrap">
+                <div class="relative flex-1 min-w-[200px]">
+                    <i data-lucide="search" class="absolute left-3 top-2.5 w-4 h-4 text-gray-400"></i>
+                    <input type="text" id="searchInput" placeholder="Search customers..."
+                        class="pl-10 pr-4 py-2 border border-gray-200 rounded-full text-xs outline-none focus:border-primary w-full transition-all">
+                </div>
+                <select id="searchType" class="border border-gray-200 rounded-full text-xs px-4 py-2 outline-none focus:border-primary">
+                    <option value="name">By Name</option>
+                    <option value="phone">By Phone</option>
+                    <option value="email">By Email</option>
+                    <option value="vehiclenumber">By Vehicle No.</option>
+                </select>
+                <button onclick="searchCustomers()" class="bg-primary text-white text-xs font-bold px-5 py-2 rounded-full hover:bg-primary-light transition-all">Search</button>
+                <button onclick="loadCustomers()" class="border border-primary text-primary text-xs font-bold px-5 py-2 rounded-full hover:bg-gray-50 transition-all">Reset</button>
+            </div>
+
+            <!-- Table -->
+            <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+                <div class="p-8 border-b border-gray-50 flex justify-between items-center bg-gray-50/30">
+                    <h3 class="font-bold text-primary">Active Customer Registry</h3>
+                    <span id="customerCount" class="text-xs text-gray-400 font-semibold"></span>
+                </div>
+                <div id="tableAlert" class="hidden mx-8 mt-4"></div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="bg-gray-50 text-[10px] uppercase tracking-widest text-gray-400 font-extrabold">
+                                <th class="px-8 py-4 text-left">S.N </th>
+                                <th class="px-8 py-4 text-left">Customer</th>
+                                <th class="px-8 py-4 text-left">Email</th>
+                                <th class="px-8 py-4 text-left">Phone</th>
+                                <th class="px-8 py-4 text-left">Gender</th>
+                                <th class="px-8 py-4 text-left">Vehicles</th>
+                                <th class="px-8 py-4 text-left">Total Spent</th>
+                                <th class="px-8 py-4 text-left">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customerTableBody">
+                            <tr><td colspan="8" class="py-20 text-center text-gray-400 italic text-sm">Loading customers...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    
+    <!--  CREATE MODAL  -->
+    
+    <div id="createModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <div>
+                    <h2 class="text-2xl font-bold text-primary">New Customer Registration</h2>
+                    <p class="text-xs text-gray-400 mt-1">Fill in the customer credentials</p>
+                </div>
+                <button onclick="closeCreateModal()" class="text-gray-400 hover:text-red-500 transition-colors ml-4">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            <div class="p-8 pt-6 space-y-5">
+                <div id="createAlert" class="hidden"></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label class="label-style">First Name *</label>
+                        <input type="text" id="c_firstName" placeholder="John" class="boxed-input">
+                        <span id="c_firstName_err" class="text-xs text-red-500 mt-1 block"></span>
+                    </div>
+                    <div>
+                        <label class="label-style">Last Name *</label>
+                        <input type="text" id="c_lastName" placeholder="Doe" class="boxed-input">
+                        <span id="c_lastName_err" class="text-xs text-red-500 mt-1 block"></span>
+                    </div>
+                    <div>
+                        <label class="label-style">Email *</label>
+                        <input type="email" id="c_email" placeholder="client@yaantra.com" class="boxed-input">
+                        <span id="c_email_err" class="text-xs text-red-500 mt-1 block"></span>
+                    </div>
+                    <div>
+                        <label class="label-style">Phone</label>
+                        <input type="text" id="c_phone" placeholder="+123 456 789" class="boxed-input">
+                    </div>
+                    <div>
+                        <label class="label-style">Password *</label>
+                        <input type="password" id="c_password" placeholder="Min 6 characters" class="boxed-input">
+                        <span id="c_password_err" class="text-xs text-red-500 mt-1 block"></span>
+                    </div>
+                    <div>
+                        <label class="label-style">Date of Birth</label>
+                        <input type="date" id="c_dob" class="boxed-input">
+                    </div>
+                    <div>
+                        <label class="label-style">Gender</label>
+                        <select id="c_gender" class="boxed-input">
+                            <option value="">Select Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="label-style">Profile Photo</label>
+                        <label for="c_profilePicture" class="boxed-input cursor-pointer flex justify-between items-center text-gray-400">
+                            <span id="c_fileName" class="text-xs">Choose Image</span>
+                            <i data-lucide="image" class="w-4 h-4"></i>
+                        </label>
+                        <input type="file" id="c_profilePicture" class="hidden" accept="image/*"
+                            onchange="document.getElementById('c_fileName').innerText = this.files[0]?.name || 'Choose Image'">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="label-style">Address</label>
+                        <input type="text" id="c_address" placeholder="123 Street, City, Country" class="boxed-input">
+                    </div>
+                </div>
+
+                <!-- Vehicles -->
+           <div>
+    <div class="flex justify-between items-center mb-3">
+        <label class="label-style mb-0">Vehicles (Optional)</label>
+        <button type="button" onclick="addVehicleRow()" class="text-xs font-bold text-primary flex items-center gap-1 hover:underline cursor-pointer">
+            <i data-lucide="plus-circle" class="w-3 h-3"></i> Add Vehicle
+        </button>
+    </div>
+    <div id="vehicleRows" class="space-y-3"></div>
+</div>
+                <div class="flex flex-col md:flex-row gap-4 pt-4 border-t border-gray-100">
+                    <button type="button" id="btnRegisterCustomer" onclick="submitCreateCustomer()" class="btn-primary">
+                        Register Customer
+                    </button>
+                    <button type="button" onclick="closeCreateModal()" class="btn-outline">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!--  EDIT MODAL                            -->
+<div id="editModal" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-header">
+            <div>
+                <h2 class="text-2xl font-bold text-primary">Edit Customer</h2>
+                <p class="text-xs text-gray-400 mt-1">Update profile and vehicle information</p>
+            </div>
+            <button onclick="closeEditModal()" class="text-gray-400 hover:text-red-500 transition-colors ml-4">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+        </div>
+        <div class="p-8 pt-6 space-y-5">
+            <input type="hidden" id="e_id">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                    <label class="label-style">First Name *</label>
+                    <input type="text" id="e_firstName" class="boxed-input">
+                </div>
+                <div>
+                    <label class="label-style">Last Name *</label>
+                    <input type="text" id="e_lastName" class="boxed-input">
+                </div>
+                <div>
+                    <label class="label-style">Email *</label>
+                    <input type="email" id="e_email" class="boxed-input">
+                </div>
+                <div>
+                    <label class="label-style">Phone</label>
+                    <input type="text" id="e_phone" class="boxed-input">
+                </div>
+                <div>
+                    <label class="label-style">Date of Birth</label>
+                    <input type="date" id="e_dob" class="boxed-input">
+                </div>
+                <div>
+                    <label class="label-style">Gender</label>
+                    <select id="e_gender" class="boxed-input">
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </div>
+                <div class="md:col-span-2">
+                    <label class="label-style">Address</label>
+                    <input type="text" id="e_address" class="boxed-input">
+                </div>
+            </div>
+
+            <!-- Edit Vehicles Section -->
+            <div class="mt-6">
+                <div class="flex justify-between items-center mb-3">
+                    <label class="label-style mb-0">Managed Vehicles</label>
+                    <button type="button" onclick="createVehicleRow('editVehicleRows')" class="text-xs font-bold text-primary flex items-center gap-1 hover:underline">
+                        <i data-lucide="plus-circle" class="w-3 h-3"></i> Add Vehicle
+                    </button>
+                </div>
+                <div id="editVehicleRows" class="space-y-3"></div>
+            </div>
+
+            <div class="flex flex-col md:flex-row gap-4 pt-4 border-t border-gray-100">
+                <button type="button" onclick="submitEditCustomer()" class="btn-primary">Save Changes</button>
+                <button type="button" onclick="closeEditModal()" class="btn-outline">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+    
+    <!--  VIEW MODAL -->
+   
+    <div id="viewModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <div>
+                    <h2 class="text-2xl font-bold text-primary">Customer Details</h2>
+                    <p class="text-xs text-gray-400 mt-1">Full profile and history</p>
+                </div>
+                <button onclick="closeViewModal()" class="text-gray-400 hover:text-red-500 transition-colors ml-4">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            <div id="viewModalBody" class="p-8 pt-6 space-y-5">
+                <div class="text-center py-10 text-gray-400 italic text-sm">Loading...</div>
+            </div>
+        </div>
+    </div>
+
+    
+    <!--  DELETE MODAL   -->
+   
+    <div id="deleteModal" class="modal-overlay">
+        <div class="bg-white w-full max-w-md rounded-[2rem] shadow-2xl p-8 text-center">
+            <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i data-lucide="trash-2" class="w-8 h-8 text-red-500"></i>
+            </div>
+            <h3 class="text-xl font-bold text-primary mb-2">Delete Customer?</h3>
+            <p class="text-sm text-gray-400 mb-6">This will permanently remove the customer and all their data. This cannot be undone.</p>
+            <input type="hidden" id="deleteCustomerId">
+            <div class="flex gap-4">
+                <button onclick="confirmDelete()" class="flex-1 bg-red-500 text-white py-3 rounded-xl font-bold text-sm hover:bg-red-600 transition-all">
+                    Yes, Delete
+                </button>
+                <button onclick="closeDeleteModal()" class="flex-1 border border-gray-200 text-gray-500 py-3 rounded-xl font-bold text-sm hover:bg-gray-50 transition-all">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    
+    <script src="../staff/js/staff.js"></script>
+    <script src="../staff/js/customer-management.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            includeSidebar();
+            loadStaffProfile();
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>

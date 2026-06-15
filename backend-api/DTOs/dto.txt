@@ -1,0 +1,12 @@
+DTO Meaning (Short & Simple)
+
+DTO = Data Transfer Object
+It is a simple object used to send and receive data 
+between the server and client (or between backend layers).
+
+Why DTOs Are Needed
+    Security: Hides sensitive fields (password, tokens, etc.) from API responses.
+    Validation: Helps validate input data before saving to database.
+    Clean API: Keeps API request/response format clean and separate from database models.
+    Avoid Overexposing DB Fields: Prevents sending unnecessary fields from the database.
+    Consistency: Ensures a fixed structure for data coming in and going out.

@@ -1,0 +1,179 @@
+<!-- Lucide Icons Library -->
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<!-- OVERLAY (mobile only) -->
+<div id="sidebarOverlay" class="fixed inset-0 bg-black/40 hidden md:hidden z-40"></div>
+
+<!-- SIDEBAR -->
+<aside id="adminSidebar" class="fixed inset-y-0 left-0 w-64 bg-[#062621] shadow-2xl flex flex-col z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300">
+    
+    <!-- HEADER / LOGO SECTION -->
+    <div class="flex flex-col items-center justify-center gap-2 px-4 pt-10 pb-6">
+        <div class="w-16 h-16 rounded-full flex items-center justify-center border border-white/10 bg-white/5 shadow-inner">
+            <img src="/frontend/assets/images/Logo/logo.png" class="w-10 h-10 object-contain opacity-80" alt="Logo">
+        </div>
+        <div class="text-center mt-2">
+            <h2 class="text-white font-bold text-xl tracking-tighter uppercase leading-none">Yaantra</h2>
+            <div class="mt-2">
+                <span class="text-[9px] bg-[#10b981] text-white px-3 py-1 rounded-md font-extrabold tracking-widest uppercase">Admin Terminal</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- NAVIGATION LINKS -->
+    <nav class="flex-1 px-4 py-4 space-y-1 overflow-y-auto mt-4" id="adminNavLinks">
+
+        <a href="/frontend/admin/pages/dashboard.html" data-nav-link class="nav-item flex items-center gap-3 px-4 py-3 text-white/60 rounded-xl transition-all duration-200 hover:text-white group">
+            <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+            <span class="text-[14px] font-medium tracking-tight">Global Dashboard</span>
+        </a>
+
+        <a href="/frontend/admin/pages/staff/staff.html" data-nav-link class="nav-item flex items-center gap-3 px-4 py-3 text-white/60 rounded-xl transition-all duration-200 hover:text-white group">
+            <i data-lucide="shield-check" class="w-5 h-5"></i>
+            <span class="text-[14px] font-medium tracking-tight">Staff Management</span>
+        </a>
+
+        <a href="/frontend/admin/pages/products/products.html" data-nav-link class="nav-item flex items-center gap-3 px-4 py-3 text-white/60 rounded-xl transition-all duration-200 hover:text-white group">
+            <i data-lucide="package" class="w-5 h-5"></i>
+            <span class="text-[14px] font-medium tracking-tight">Product Catalog</span>
+        </a>
+
+        <a href="/frontend/admin/pages/customers/customers.html" data-nav-link class="nav-item flex items-center gap-3 px-4 py-3 text-white/60 rounded-xl transition-all duration-200 hover:text-white group">
+            <i data-lucide="users-2" class="w-5 h-5"></i>
+            <span class="text-[14px] font-medium tracking-tight">Customer Registry</span>
+        </a>
+
+        <a href="/frontend/admin/pages/vendors/vendors.html" data-nav-link class="nav-item flex items-center gap-3 px-4 py-3 text-white/60 rounded-xl transition-all duration-200 hover:text-white group">
+            <i data-lucide="truck" class="w-4 h-4"></i>
+            <span class="text-[14px] font-medium tracking-tight">Vendor Network</span>
+        </a>
+            <a href="/frontend/admin/pages/purchases/purchases.html" data-nav-link class="nav-item flex items-center gap-3 px-4 py-3 text-white/60 rounded-xl transition-all duration-200 hover:text-white group">
+            <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+            <span class="text-[14px] font-medium tracking-tight">Purchases</span>
+        </a>
+
+
+        <!-- Section Header -->
+        <div class="pt-8 pb-2 px-4 text-[10px] font-bold text-white/20 uppercase tracking-[0.2em]">Data & Ops</div>
+
+        <a href="/frontend/admin/pages/customers/CustomerRequest.html" data-nav-link class="nav-item flex items-center gap-3 px-4 py-3 text-white/60 rounded-xl transition-all duration-200 hover:text-white group">
+            <i data-lucide="clipboard-list" class="w-5 h-5"></i>
+            <span class="text-[14px] font-medium tracking-tight">Part Requests</span>
+        </a>
+
+        <a href="/frontend/admin/pages/reports/reports.html" data-nav-link class="nav-item flex items-center gap-3 px-4 py-3 text-white/60 rounded-xl transition-all duration-200 group">
+            <i data-lucide="bar-chart-big" class="w-5 h-5"></i>
+            <span class="text-[14px] font-medium tracking-tight">Reports</span>
+        </a>
+
+        <a href="/frontend/admin/pages/settings/settings.html" data-nav-link class="nav-item flex items-center gap-3 px-4 py-3 text-white/60 rounded-xl transition-all duration-200 hover:text-white group">
+            <i data-lucide="settings" class="w-5 h-5"></i>
+            <span class="text-[14px] font-medium tracking-tight">Settings</span>
+        </a>
+        
+
+    </nav>
+        
+
+        <!-- BOTTOM ACTIONS -->
+    <div class="p-4 bg-black/10 space-y-2 border-t border-white/5">
+        
+        <!-- BACK TO WEBSITE -->
+        <a href="/frontend/pages/homepage.html" class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-emerald-500/10 text-emerald-400 text-[10px] font-bold uppercase tracking-widest transition hover:bg-emerald-600 hover:text-white">
+            <i data-lucide="globe" class="w-4 h-4"></i>
+            Back to Website
+        </a>
+
+        <!-- LOGOUT -->
+        <button id="logoutTrigger" class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-red-500/10 text-red-400 text-[10px] font-bold uppercase tracking-widest transition hover:bg-red-600 hover:text-white">
+            <i data-lucide="power" class="w-4 h-4"></i>
+            Logout
+        </button>
+    </div>
+</aside>
+
+<!-- Logout Modal -->
+<div id="logoutModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm hidden">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-xs p-8 flex flex-col items-center">
+        <div class="w-14 h-14 bg-red-50 text-red-500 rounded-full flex items-center justify-center mb-4">
+            <i data-lucide="log-out" class="w-6 h-6"></i>
+        </div>
+        <h2 class="text-xl font-bold text-gray-900">Logout</h2>
+        <p class="text-sm text-gray-500 text-center mt-2 mb-8">Are you sure you want to exit the admin terminal?</p>
+        <div class="flex gap-3 w-full">
+            <button id="cancelLogout" class="flex-1 py-3 rounded-xl bg-gray-100 text-gray-700 text-xs font-bold uppercase tracking-widest hover:bg-gray-200 transition">No</button>
+            <button id="confirmLogout" class="flex-1 py-3 rounded-xl bg-red-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-red-700 shadow-lg shadow-red-200 transition">Yes</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 1. Initialize Icons
+    if (window.lucide) {
+        lucide.createIcons();
+    }
+
+    // 2. Active Link Logic
+    function highlightActiveSidebarLink() {
+        const currentPath = window.location.pathname;
+        const navLinks = document.querySelectorAll('[data-nav-link]');
+        
+        navLinks.forEach(link => {
+            if (currentPath.includes(link.getAttribute('href'))) {
+                // Apply Active Styles
+                link.classList.remove('text-white/60');
+                link.classList.add('bg-white', 'text-[#062621]', 'shadow-xl');
+                
+                // Fix icon inside active link
+                const icon = link.querySelector('i');
+                if (icon) {
+                    icon.setAttribute('stroke', '#062621');
+                    icon.classList.remove('text-white/60');
+                }
+            }
+        });
+    }
+
+    // 3. Mobile Menu Functions
+    function openSidebar() {
+        document.getElementById('adminSidebar').classList.remove('-translate-x-full');
+        document.getElementById('sidebarOverlay').classList.remove('hidden');
+    }
+    function closeSidebar() {
+        document.getElementById('adminSidebar').classList.add('-translate-x-full');
+        document.getElementById('sidebarOverlay').classList.add('hidden');
+    }
+
+    // 4. Logout Logic Initialization
+    function initLogoutLogic() {
+        const trigger = document.getElementById('logoutTrigger');
+        const modal = document.getElementById('logoutModal');
+        const cancel = document.getElementById('cancelLogout');
+        const confirm = document.getElementById('confirmLogout');
+        const overlay = document.getElementById('sidebarOverlay');
+
+        if (trigger) trigger.onclick = () => modal.classList.remove('hidden');
+        if (cancel) cancel.onclick = () => modal.classList.add('hidden');
+        if (overlay) overlay.onclick = closeSidebar;
+
+        if (confirm) {
+            confirm.onclick = () => {
+                console.log("Admin Logging out...");
+                localStorage.clear(); // Clear all tokens/sessions
+                window.location.href = '/frontend/auth/login.html';
+            };
+        }
+    }
+
+    // Run all initializations
+    document.addEventListener('DOMContentLoaded', () => {
+        highlightActiveSidebarLink();
+        initLogoutLogic();
+    });
+    
+    // In case the sidebar is loaded via fetch (which doesn't always trigger DOMContentLoaded)
+    setTimeout(() => {
+        highlightActiveSidebarLink();
+        initLogoutLogic();
+    }, 100);
+</script>

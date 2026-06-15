@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Staff</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../../../assets/css/custom.css">
+    <link rel="stylesheet" href="../../../assets/css/tailwind.css">
+</head>
+
+<body class="bg-gray-100">
+
+<script>
+    const token = localStorage.getItem('token');
+    const userRole = localStorage.getItem('userRole');
+    if (!token || userRole !== 'Admin') {
+        window.location.href = '/frontend/auth/login.html?message=Login First';
+    }
+</script>
+
+<div id="sidebar-placeholder"></div>
+<!-- ================= MAIN CONTENT ================= -->
+<div class="ml-72 min-h-screen">
+    <div class="relative w-full">
+        <header class="shadow px-8 py-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4 w-full z-30 sticky top-0" style="background-color: var(--color-primary); left:0;">
+            <div class="w-full flex flex-col items-center md:items-start justify-center">
+                <h1 class="text-2xl font-bold text-white mb-1 w-full text-center md:text-left">Register New Staff</h1>
+            </div>
+            <div class="flex gap-2 flex-nowrap justify-center md:justify-end">
+                <button onclick="window.location.href='staff.html'" class="btn btn-secondary flex flex-row items-center gap-2 text-sm px-3 py-1.5 whitespace-nowrap">
+                    Back to Staff
+                </button>
+            </div>
+        </header>
+    </div>
+
+    <div class="p-6 space-y-6">
+        <div class="bg-white shadow rounded-lg overflow-hidden max-w-2xl mx-auto">
+            <div class="p-6 border-b">
+                <h2 class="text-lg font-bold text-gray-900">Add New Staff Member</h2>
+                <p class="text-sm text-gray-600 mt-1">Fill in all required fields</p>
+            </div>
+
+            <form id="staffForm" class="p-6 space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                        <input type="text" id="firstName" placeholder="Enter first name" class="w-full border px-3 py-2 rounded text-sm" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                        <input type="text" id="lastName" placeholder="Enter last name" class="w-full border px-3 py-2 rounded text-sm" required>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input type="email" id="email" placeholder="Enter email" class="w-full border px-3 py-2 rounded text-sm" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                        <input type="text" id="phone" placeholder="Enter phone number" class="w-full border px-3 py-2 rounded text-sm" required>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                    <input type="text" id="address" placeholder="Enter address" class="w-full border px-3 py-2 rounded text-sm" required>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <input type="password" id="password" placeholder="Enter password" class="w-full border px-3 py-2 rounded text-sm" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Photo</label>
+                        <input type="file" id="profilePicture" class="w-full border px-3 py-2 rounded text-sm text-xs">
+                    </div>
+                </div>
+
+                <div id="alertBox" class="p-3 rounded text-sm" style="display:none;"></div>
+
+                <div class="flex gap-3 pt-4">
+                    <button type="button" onclick="submitStaffRegistration()" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded font-medium text-sm">Register Staff</button>
+                    <button type="button" onclick="window.location.href='staff.html'" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-900 py-2 rounded font-medium text-sm">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<script src="../../js/staff.js"></script>
+<script>
+function initAdminSidebar(container) {
+    if (!container) return;
+    const currentPath = window.location.pathname.replace(/\/+$/, '');
+    container.querySelectorAll('[data-nav-link]').forEach((link) => {
+        const linkPath = new URL(link.href, window.location.origin).pathname.replace(/\/+$/, '');
+        if (linkPath === currentPath) {
+            link.classList.add('bg-[#1f6b58]', 'border-l-white', 'font-bold');
+        }
+    });
+}
+
+// Inject sidebar partial
+fetch('/frontend/admin/includes/sidebar-admin.html')
+    .then(res => res.text())
+    .then(data => {
+        const sc = document.getElementById('sidebar-placeholder');
+        sc.innerHTML = data;
+        initAdminSidebar(sc);
+    });
+</script>
+</body>
+</html>

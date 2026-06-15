@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YAANTRA - Product Details</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/custom.css">
+<link rel="stylesheet" href="../assets/css/tailwind.css">
+</head>
+<body class="min-h-screen flex flex-col bg-[var(--color-secondary)] text-gray-900 [font-family:'Sora',sans-serif]">
+<div id="storefront-header-container"></div>
+
+<main class="flex-grow pt-[185px] md:pt-[265px] lg:pt-[210px] pb-16">
+
+<section class="py-12">
+<div class="container mx-auto px-6">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+
+  <!-- Image Panel -->
+  <div class="bg-[var(--color-light)] rounded-2xl border border-[#e8ebe9] p-6">
+    <div class="detail-image-wrap flex items-center justify-center min-h-[340px]">
+      <img id="detail-image" src="https://via.placeholder.com/700x520.png?text=Product" alt="Product"
+        class="w-full max-h-[480px] rounded-xl object-contain">
+    </div>
+    <div id="detail-thumbnails" class="mt-4 flex gap-3 overflow-x-auto pb-1"></div>
+  </div>
+
+  <!-- Info Panel -->
+  <div class="space-y-5">
+    <span id="detail-category" class="inline-block bg-[var(--color-primary)]/10 text-[var(--color-primary)] text-xs font-semibold px-3 py-1 rounded-full">Vehicle Part</span>
+    <h1 id="detail-name" class="text-3xl md:text-4xl font-bold text-gray-900">Loading product...</h1>
+    <p id="detail-description" class="text-gray-600 leading-relaxed">Fetching product information.</p>
+
+    <!-- Price -->
+    <div class="flex items-center gap-4">
+      <div class="text-3xl font-bold text-[var(--color-primary)]" id="detail-price">Rs 0.00</div>
+      <div id="detail-discount" class="hidden text-lg line-through text-gray-400" ></div>
+    </div>
+
+    <!-- Qty -->
+    <div class="flex items-center gap-3">
+      <label for="qty-input" class="text-sm font-semibold text-gray-700">Qty</label>
+      <input id="qty-input" type="number" min="1" value="1"
+        class="w-20 rounded-lg border border-[#e8ebe9] bg-[var(--color-light)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]">
+    </div>
+
+    <!-- Actions -->
+    <div class="flex gap-3 flex-wrap">
+      <button id="add-cart-btn"
+        class="btn-primary py-3 px-8 rounded-xl font-semibold transition min-w-[140px]">Add to Cart</button>
+      <a href="shop.html"
+        class="border-2 border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white py-3 px-6 rounded-xl font-semibold transition">
+        Back to Shop
+      </a>
+    </div>
+  </div>
+
+</div>
+</div>
+</section>
+</main>
+<div id="toast" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a1a1a;color:#fff;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:500;z-index:9999;transition:all 0.3s ease;opacity:0;pointer-events:none;white-space:nowrap;"></div>
+<div id="storefront-footer-container"></div>
+<script src="../assets/js/jwt-decode.js"></script>
+<script src="../assets/js/homepage.js"></script>
+<script src="../assets/js/product-details.js"></script>
+</body>
+</html>

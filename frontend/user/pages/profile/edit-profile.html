@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en" class="min-h-screen bg-[#f8faf9]">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile</title>
+    
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="/frontend/assets/css/custom.css">
+    <link rel="stylesheet" href="/frontend/assets/css/tailwind.css">
+    
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            letter-spacing: -0.02em;
+            background-color: #f8faf9;
+        }
+        .admin-input {
+            background-color: #f9fafb;
+            border: 1px solid #f3f4f6;
+            border-radius: 1.25rem;
+            padding: 0.85rem 1.25rem;
+            font-size: 0.875rem;
+            width: 100%;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .admin-input:focus {
+            background-color: #fff;
+            border-color: #10b981;
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.05);
+        }
+        .admin-input::placeholder {
+            color: #cbd5e1;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-[#062621]">
+    <script>
+        // Check if user is logged in
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '/frontend/auth/login.html?message=Login First';
+        }
+    </script>
+    <div id="sidebar-container"></div>
+
+    <div class="md:ml-64 min-h-screen transition-all duration-300">
+        
+        <!-- TOP HEADER -->
+        <header class="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-100 px-8 py-5 flex items-center justify-between">
+            <div>
+                <h1 class="text-xl font-extrabold text-[#062621] tracking-tighter uppercase">Edit Profile</h1>
+                <p class="text-[10px] text-gray-400 font-bold tracking-widest uppercase opacity-70 mt-1">Update Your Information</p>
+            </div>
+            <a href="user-profile.html" class="text-[#062621] text-2xl font-bold leading-none hover:text-[#10b981]" aria-label="Back to profile">←</a>
+        </header>
+
+        <div class="p-8 max-w-3xl mx-auto">
+            <div id="editProfileMsg" class="hidden mb-6 text-center text-sm"></div>
+            
+            <div class="bg-white rounded-[2.5rem] shadow-xl border border-white p-8">
+
+                <form id="editProfileForm" class="space-y-6" novalidate>
+                    <div class="flex justify-center mb-6">
+                        <img id="profileImagePreview" src="/frontend/assets/images/image.png" alt="Profile Image" class="w-32 h-32 rounded-full object-cover border-4 border-emerald-200 shadow-md" />
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label for="firstName" class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.15em] ml-1">First Name</label>
+                            <input type="text" id="firstName" name="firstName" placeholder="Enter First Name" class="admin-input" required />
+                            <p id="firstNameError" class="hidden text-red-500 text-[10px] font-bold mt-1 px-1"></p>
+                        </div>
+                        <div class="space-y-2">
+                            <label for="lastName" class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.15em] ml-1">Last Name</label>
+                            <input type="text" id="lastName" name="lastName" placeholder="Enter Last Name" class="admin-input" required />
+                            <p id="lastNameError" class="hidden text-red-500 text-[10px] font-bold mt-1 px-1"></p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label for="email" class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.15em] ml-1">Email</label>
+                            <input type="email" id="email" name="email" placeholder="Enter Email Address" class="admin-input" required />
+                            <p id="emailError" class="hidden text-red-500 text-[10px] font-bold mt-1 px-1"></p>
+                        </div>
+                        <div class="space-y-2">
+                            <label for="phone" class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.15em] ml-1">Phone</label>
+                            <input type="text" id="phone" name="phone" placeholder="Enter Phone Number" class="admin-input" />
+                            <p id="phoneError" class="hidden text-red-500 text-[10px] font-bold mt-1 px-1"></p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label for="address" class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.15em] ml-1">Address</label>
+                            <input type="text" id="address" name="address" placeholder="Enter Address" class="admin-input" />
+                        </div>
+                        <div class="space-y-2">
+                            <label for="gender" class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.15em] ml-1">Gender</label>
+                            <select id="gender" name="gender" class="admin-input">
+                                <option value="">Select Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label for="dateOfBirth" class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.15em] ml-1">Date of Birth</label>
+                            <input type="date" id="dateOfBirth" name="dateOfBirth" class="admin-input" />
+                        </div>
+                        <div class="space-y-2">
+                            <label for="profileImage" class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.15em] ml-1">Upload Profile Picture</label>
+                            <input type="file" id="profileImage" name="profileImage" accept="image/*" class="admin-input" />
+                        </div>
+                    </div>
+
+                    <div class="flex gap-4 pt-4 border-t border-gray-50">
+                        <button type="submit" class="flex-1 bg-[#062621] text-white py-3 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] transition hover:opacity-95 shadow-xl shadow-emerald-950/10">Save Changes</button>
+                        <button type="button" onclick="window.location.href='user-profile.html'" class="flex-1 bg-gray-50 text-gray-400 py-3 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] hover:bg-gray-100 transition">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../../assets/js/alert.js"></script>
+    <script src="../../js/editUser.js"></script>
+    <script>
+        // Initialize sidebar
+        fetch('/frontend/user/includes/sidebar-user.html')
+            .then(res => res.text())
+            .then(data => {
+                document.getElementById('sidebar-container').innerHTML = data;
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+
+               
+                const currentPath = window.location.pathname;
+                document.querySelectorAll('[data-nav-link]').forEach(link => {
+                    const href = link.getAttribute('href');
+                    if (href && currentPath.includes(href.split('/').pop())) {
+                        link.classList.add('bg-emerald-600', 'shadow-lg', 'text-white', 'font-semibold');
+                        link.classList.remove('text-white/60', 'hover:bg-white/10');
+                    }
+                });
+            });
+    </script>
+</body>
+</html>

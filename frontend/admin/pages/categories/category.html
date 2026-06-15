@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Category Management | Yaantra Admin</title>
+    
+   
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="../../../assets/css/custom.css">
+    <link rel="stylesheet" href="../../../assets/css/tailwind.css">
+
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: -0.02em; background-color: #f8faf9; }
+        .ts-alert-success { background-color: #ecfdf5; color: #065f46; border: 1px solid #10b981; padding: 1rem; border-radius: 1rem; font-weight: 700; }
+        .ts-alert-error { background-color: #fef2f2; color: #991b1b; border: 1px solid #ef4444; padding: 1rem; border-radius: 1rem; font-weight: 700; }
+        .table-container { border: 1px solid rgba(16, 185, 129, 0.2); box-shadow: 0 20px 25px -5px rgba(6, 38, 33, 0.05); }
+        
+        .admin-input {
+            background-color: #f9fafb;
+            border: 1px solid #f3f4f6;
+            border-radius: 1rem;
+            padding: 0.85rem 1.25rem;
+            font-size: 0.875rem;
+            width: 100%;
+            outline: none;
+        }
+        .admin-input:focus { background-color: #fff; border-color: #10b981; }
+    </style>
+</head>
+
+<body class="min-h-screen text-[#062621]">
+
+<!-- Sidebar Container -->
+<div id="sidebar-container"></div>
+
+<!-- ================= MAIN CONTENT ================= -->
+<div class="md:ml-64 min-h-screen transition-all duration-300">
+    
+    <!-- TOP HEADER -->
+    <header class="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-100 px-8 py-5 flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-[800] text-[#062621] tracking-tighter uppercase leading-none">Category Management</h1>
+            <p class="text-[10px] text-gray-400 font-bold tracking-widest uppercase opacity-70 mt-1">Organize Product Classifications.</p>
+        </div>
+        
+        <div class="flex items-center gap-3">
+            <button onclick="openAddCategoryModal()" class="bg-[#062621] text-white px-5 py-2.5 rounded-xl font-bold text-[11px] uppercase tracking-widest flex items-center gap-2 hover:opacity-90 transition shadow-lg">
+                <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                Add Category
+            </button>
+            <a href="../products/products.html" class="bg-emerald-50 text-emerald-700 px-5 py-2.5 rounded-xl font-bold text-[11px] uppercase tracking-widest flex items-center gap-2 hover:bg-emerald-100 transition border border-emerald-100">
+                <i data-lucide="package" class="w-4 h-4"></i>
+                Products
+            </a>
+        </div>
+    </header>
+
+    <div class="p-8 space-y-8 max-w-[1600px] mx-auto">
+        <!-- SEARCH -->
+        <div class="relative group">
+            <i data-lucide="search" class="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300"></i>
+            <input id="searchInput" type="text" placeholder="Search categories..." class="w-full bg-white border-none shadow-sm rounded-2xl py-5 pl-14 pr-6 outline-none text-sm transition">
+        </div>
+
+        <div id="alertBox" class="hidden"></div>
+
+        <!-- TABLE SECTION -->
+        <div class="table-container bg-white rounded-[2.5rem] overflow-hidden">
+            <div class="px-8 py-6 border-b border-gray-50 flex justify-between items-center">
+                <h2 class="text-base font-bold text-[#062621] uppercase tracking-tight">Product Taxonomies</h2>
+                <button onclick="loadCategories()" class="text-gray-400 hover:text-emerald-500 transition"><i data-lucide="refresh-cw" class="w-4 h-4"></i></button>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-[#062621] text-white/50 text-[10px] uppercase tracking-[0.2em]">
+                        <tr>
+                            <th class="px-8 py-5 font-bold">S.N</th>
+                            <th class="px-8 py-5 font-bold">Category Name</th>
+                            <th class="px-8 py-5 font-bold text-center">Linked Products</th>
+                            <th class="px-8 py-5 font-bold text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="categoryTable" class="divide-y divide-gray-50 text-sm font-medium">
+                      
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- PAGINATION -->
+            <div class="flex justify-between items-center px-10 py-6 bg-gray-50/50">
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Navigation</p>
+                <div class="flex items-center gap-2">
+                    <button id="prevBtn" onclick="prevPage()" class="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-gray-100 transition text-gray-400 disabled:opacity-20"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+                    <div id="paginationNumbers" class="flex gap-2"></div>
+                    <button id="nextBtn" onclick="nextPage()" class="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-gray-100 transition text-gray-400 disabled:opacity-20"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ================= MODALS ================= -->
+
+<!-- ADD CATEGORY MODAL -->
+<div id="addCategoryModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm hidden p-4">
+    <div class="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
+        <div class="bg-[#062621] p-8 flex justify-between items-center text-white">
+            <h2 class="font-extrabold uppercase tracking-widest text-white">New Category</h2>
+            <button onclick="closeAddCategoryModal()" class="text-white/50 hover:text-white transition text-2xl font-light">&times;</button>
+        </div>
+        <form id="addCategoryForm" class="p-10 space-y-6">
+            <div class="text-left">
+                <label class="block text-[10px] font-black text-gray-400 uppercase mb-2 ml-1">Classification Name</label>
+                <input type="text" id="addCategoryName" placeholder="e.g. Engine Components" class="admin-input" required>
+            </div>
+            <div class="flex gap-3 pt-6 border-t border-gray-50">
+                <button type="submit" class="flex-1 bg-[#062621] text-white py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest transition shadow-lg">Create Category</button>
+                <button type="button" onclick="closeAddCategoryModal()" class="flex-1 bg-gray-100 text-gray-400 py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- EDIT CATEGORY MODAL -->
+<div id="editCategoryModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm hidden p-4">
+    <div class="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden">
+        <div class="bg-[#062621] p-8 flex justify-between items-center text-white">
+            <h2 class="font-extrabold uppercase tracking-widest text-white">Modify Category</h2>
+            <button onclick="closeEditCategoryModal()" class="text-white/50 hover:text-white transition text-2xl font-light">&times;</button>
+        </div>
+        <form id="editCategoryForm" class="p-10 space-y-6">
+            <input type="hidden" id="editCategoryId">
+            <div class="text-left">
+                <label class="block text-[10px] font-black text-gray-400 uppercase mb-2 ml-1">Updated Name</label>
+                <input type="text" id="editCategoryName" class="admin-input" required>
+            </div>
+            <div class="flex gap-3 pt-6 border-t border-gray-50">
+                <button type="submit" class="flex-1 bg-[#062621] text-white py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest transition">Save Changes</button>
+                <button type="button" onclick="closeEditCategoryModal()" class="flex-1 bg-gray-100 text-gray-400 py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest">Discard</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- DELETE MODAL -->
+<div id="deleteCategoryModal" class="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 backdrop-blur-sm hidden p-4">
+    <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-sm p-10 text-center">
+        <div class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6"><i data-lucide="trash-2" class="w-8 h-8"></i></div>
+        <h2 class="text-xl font-extrabold text-[#062621]">Delete Category?</h2>
+        <p class="text-gray-400 text-sm mt-2 mb-8">Items in this category will become uncategorized.</p>
+        <div class="flex gap-3">
+            <button onclick="closeDeleteCategoryModal()" class="flex-1 py-4 bg-gray-100 text-gray-400 rounded-2xl font-bold text-[10px] uppercase">Cancel</button>
+            <button id="confirmDeleteBtn" class="flex-1 py-4 bg-red-600 text-white rounded-2xl font-bold text-[10px] uppercase shadow-lg shadow-red-200">Delete</button>
+        </div>
+    </div>
+</div>
+
+<script src="../../js/categories.js"></script>
+<script>
+    // SIDEBAR INJECTION
+    fetch('/frontend/admin/includes/sidebar-admin.html')
+        .then(res => res.text())
+        .then(data => {
+            document.getElementById('sidebar-container').innerHTML = data;
+            if (window.lucide) lucide.createIcons();
+
+     
+            document.querySelectorAll('[data-nav-link]').forEach(link => {
+                if (link.getAttribute('href').includes('products.html')) {
+                    link.classList.add('bg-[#10b981]', 'shadow-sm'); 
+                    link.classList.remove('text-white/70', 'text-white');
+                    link.classList.add('text-[#062621]', 'font-bold');
+                    const icon = link.querySelector('i');
+                    if (icon) icon.setAttribute('stroke', '#062621');
+                }
+            });
+        });
+</script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Product | Yaantra Admin</title>
+    
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="../../../assets/css/custom.css">
+    <link rel="stylesheet" href="../../../assets/css/tailwind.css">
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            letter-spacing: -0.02em;
+            background-color: #f8faf9;
+        }
+        .admin-input {
+            background-color: #f9fafb;
+            border: 1px solid #f3f4f6;
+            border-radius: 1.25rem;
+            padding: 0.85rem 1.25rem;
+            font-size: 0.875rem;
+            width: 100%;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .admin-input:focus {
+            background-color: #fff;
+            border-color: #10b981;
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.05);
+        }
+        /* Custom alert styles from logic */
+        .ts-alert-success { background-color: #ecfdf5; color: #065f46; border: 1px solid #10b981; padding: 1rem; border-radius: 1rem; font-weight: 700; }
+        .ts-alert-error { background-color: #fef2f2; color: #991b1b; border: 1px solid #ef4444; padding: 1rem; border-radius: 1rem; font-weight: 700; }
+    </style>
+</head>
+
+<body class="min-h-screen text-[#062621]">
+
+<!-- Auth Guard -->
+<script>
+    const token = localStorage.getItem('token');
+    const userRole = localStorage.getItem('userRole');
+    if (!token || userRole !== 'Admin') {
+        window.location.href = '/frontend/auth/login.html?message=Login First';
+    }
+</script>
+
+<div id="sidebar-container"></div>
+
+<!-- ================= MAIN CONTENT ================= -->
+<div class="md:ml-64 min-h-screen transition-all duration-300">
+    
+    <!-- HEADER -->
+    <header class="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-100 px-8 py-5 flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-extrabold text-[#062621] tracking-tighter uppercase">Add New Product</h1>
+            <p class="text-[10px] text-gray-400 font-bold tracking-widest uppercase opacity-70">Catalog Entry Portal</p>
+        </div>
+        
+        <div class="flex items-center gap-4">
+            <a href="products.html" class="text-[10px] font-black text-gray-400 uppercase tracking-widest hover:text-[#062621] transition">Back to Catalog</a>
+            <div class="h-8 w-[1px] bg-gray-100 mx-1"></div>
+            <div class="w-10 h-10 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-[10px] font-bold text-[#062621]">AD</div>
+        </div>
+    </header>
+
+    <div class="p-8 max-w-5xl mx-auto">
+        
+        <!-- ALERT BOX -->
+        <div id="alertBox" class="hidden mb-6 text-center"></div>
+
+        <!-- FORM CARD -->
+        <div class="bg-white rounded-[2.5rem] shadow-xl border border-white p-10">
+            <div class="mb-10 text-center">
+                <div class="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <i data-lucide="package-plus" class="w-8 h-8"></i>
+                </div>
+                <h2 class="text-2xl font-black text-[#062621] uppercase tracking-tighter">Product Information</h2>
+                <p class="text-xs text-gray-400 font-medium">Please ensure all specifications are accurate.</p>
+            </div>
+
+            <form id="productForm" class="space-y-8" enctype="multipart/form-data">
+                
+                <!-- PRIMARY FIELDS -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Product Name -->
+                    <div class="space-y-2">
+                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.15em] ml-1">Product Name</label>
+                        <input type="text" id="name" name="name" placeholder="e.g. Exide Car Battery" class="admin-input" required>
+                        <p id="nameError" class="hidden text-red-500 text-[10px] font-bold mt-1 px-1"></p>
+                    </div>
+
+                    <!-- SKU -->
+                    <div class="space-y-2">
+                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.15em] ml-1">SKU Number</label>
+                        <input type="text" id="sku" name="sku" placeholder="e.g. BAT-2024-X" class="admin-input" required>
+                        <p id="skuError" class="hidden text-red-500 text-[10px] font-bold mt-1 px-1"></p>
+                    </div>
+
+                    <!-- Price -->
+                    <div class="space-y-2">
+                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.15em] ml-1">Price (Rs)</label>
+                        <input type="number" id="price" name="price" placeholder="0.00" class="admin-input" required>
+                        <p id="priceError" class="hidden text-red-500 text-[10px] font-bold mt-1 px-1"></p>
+                    </div>
+
+                    <!-- Stock -->
+                    <div class="space-y-2">
+                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.15em] ml-1">Inventory Quantity</label>
+                        <input type="number" id="stockQty" name="stockQty" placeholder="e.g. 50" class="admin-input" required>
+                        <p id="stockQtyError" class="hidden text-red-500 text-[10px] font-bold mt-1 px-1"></p>
+                    </div>
+
+                    <!-- Category -->
+                    <div class="space-y-2">
+                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.15em] ml-1">Product Category</label>
+                        <select id="categoryId" name="categoryId" class="admin-input appearance-none bg-no-repeat bg-right pr-10" style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23cbd5e1%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C/polyline%3E%3C/svg%3E'); background-position: right 1rem center; background-size: 1rem;" required>
+                            <option value="">Select Category</option>
+                        </select>
+                        <p id="categoryIdError" class="hidden text-red-500 text-[10px] font-bold mt-1 px-1"></p>
+                    </div>
+
+                    <!-- Images -->
+                    <div class="space-y-2">
+                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.15em] ml-1">Media Assets (Images)</label>
+                        <input type="file" id="images" name="images" multiple class="w-full text-xs text-gray-400 file:mr-4 file:py-3 file:px-6 file:rounded-full file:border-0 file:text-[10px] file:font-black file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 transition cursor-pointer">
+                    </div>
+                </div>
+
+                <!-- DESCRIPTION -->
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.15em] ml-1">Detailed Description</label>
+                    <textarea id="description" name="description" rows="4" placeholder="Technical specifications, features, and warranty details..." class="admin-input resize-none"></textarea>
+                    <p id="descriptionError" class="hidden text-red-500 text-[10px] font-bold mt-1 px-1"></p>
+                </div>
+
+                <!-- FORM ACTIONS -->
+                <div class="flex gap-4 pt-6 border-t border-gray-50">
+                    <button type="submit" class="flex-1 bg-[#062621] text-white py-4 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] transition hover:opacity-95 shadow-xl shadow-emerald-950/10">Add to Catalog</button>
+                    <a href="products.html" class="flex-1 bg-gray-50 text-gray-400 py-4 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] text-center hover:bg-gray-100 transition">Discard</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="../../js/products.js"></script>
+<script>
+    // SIDEBAR INJECTION
+    fetch('/frontend/admin/includes/sidebar-admin.html')
+        .then(res => res.text())
+        .then(data => {
+            document.getElementById('sidebar-container').innerHTML = data;
+            if (window.lucide) lucide.createIcons();
+
+            
+            document.querySelectorAll('[data-nav-link]').forEach(link => {
+                if (link.getAttribute('href').includes('products.html')) {
+                    link.classList.add('bg-[#10b981]', 'shadow-sm'); 
+                    link.classList.remove('text-white/70', 'text-white');
+                    link.classList.add('text-[#062621]', 'font-bold');
+                    const icon = link.querySelector('i');
+                    if (icon) icon.setAttribute('stroke', '#062621');
+                }
+            });
+        });
+</script>
+
+</body>
+</html>

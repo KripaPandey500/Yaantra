@@ -1,0 +1,11 @@
+| **Method**           | **What it Does**         | **Most Common Use**  |
+| -------------------- | ------------------------ | -------------------- |
+| ToListAsync          | Get full list            | Listing pages        |
+| SaveChangesAsync     | Save DB changes          | Insert/Update/Delete |
+| FindAsync            | Find by primary key fast | Get by ID            |
+| AddAsync             | Add one item             | Create record        |
+| AddRangeAsync        | Add many items           | Bulk insert          |
+| CountAsync           | Count rows               | Stats + pagination   |
+| FirstOrDefaultAsync  | First record or null     | Login, lookups       |
+| SingleOrDefaultAsync | Exactly one record       | Settings             |
+| AnyAsync             | Check existence          | Duplicate checks     |

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Reports | Yaantra Admin</title>
+    
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="../../../assets/css/custom.css">
+    <link rel="stylesheet" href="../../../assets/css/tailwind.css">
+
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: -0.02em; background-color: #f8faf9; }
+        .report-card { border: 1px solid rgba(6, 38, 33, 0.05); transition: all 0.3s ease; }
+        .report-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(6, 38, 33, 0.08); }
+        .table-container { border: 1px solid rgba(16, 185, 129, 0.2); box-shadow: 0 20px 25px -5px rgba(6, 38, 33, 0.05); }
+    </style>
+</head>
+
+<body class="min-h-screen text-[#062621]">
+
+<div id="sidebar-container"></div>
+
+<!-- ================= MAIN CONTENT ================= -->
+<div class="md:ml-64 min-h-screen transition-all duration-300">
+    
+    <!-- TOP HEADER -->
+    <header class="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-100 px-8 py-5 flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-[800] text-[#062621] tracking-tighter uppercase leading-none">System Reports</h1>
+            <p class="text-[10px] text-gray-400 font-bold tracking-widest uppercase opacity-70 mt-1">Data Analytics & Business Intelligence.</p>
+        </div>
+        
+        <div class="flex items-center gap-4">
+            <button onclick="window.print()" class="bg-[#062621] text-white px-5 py-2.5 rounded-xl font-bold text-[11px] uppercase tracking-widest flex items-center gap-2 hover:opacity-90 transition shadow-lg">
+                <i data-lucide="printer" class="w-4 h-4"></i>
+                Print Report
+            </button>
+            <div class="w-10 h-10 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-[10px] font-bold text-[#062621]">AD</div>
+        </div>
+    </header>
+
+    <div class="p-8 space-y-8 max-w-[1600px] mx-auto">
+        
+        <!-- ANALYTICS CARDS -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Revenue -->
+            <div class="bg-white rounded-[2rem] p-7 report-card">
+                <div class="flex justify-between items-start">
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                        <i data-lucide="banknote" class="w-6 h-6"></i>
+                    </div>
+                    <span class="text-[10px] font-black text-emerald-500 bg-emerald-50 px-2 py-1 rounded-lg">+14%</span>
+                </div>
+                <div class="mt-5">
+                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Gross Revenue</p>
+                    <h3 id="reportRevenue" class="text-2xl font-[800] mt-1">Rs 0</h3>
+                </div>
+            </div>
+
+            <!-- Orders -->
+            <div class="bg-white rounded-[2rem] p-7 report-card">
+                <div class="flex justify-between items-start">
+                    <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                        <i data-lucide="shopping-bag" class="w-6 h-6"></i>
+                    </div>
+                    <span class="text-[10px] font-black text-blue-500 bg-blue-50 px-2 py-1 rounded-lg">Orders</span>
+                </div>
+                <div class="mt-5">
+                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Total Completed</p>
+                    <h3 id="reportOrders" class="text-2xl font-[800] mt-1">0</h3>
+                </div>
+            </div>
+
+            <!-- Performance -->
+            <div class="bg-[#062621] rounded-[2rem] p-7 shadow-xl relative overflow-hidden">
+                <div class="relative z-10">
+                    <p class="text-[10px] text-emerald-400 font-black uppercase tracking-[0.2em]">System Health</p>
+                    <h3 class="text-white text-3xl font-[800] mt-2">99.9%</h3>
+                    <p class="text-white/40 text-[10px] mt-4 font-bold uppercase">Uptime Monitoring Active</p>
+                </div>
+                <i data-lucide="activity" class="absolute -right-4 -bottom-4 w-24 h-24 text-white/5"></i>
+            </div>
+
+            <!-- Growth -->
+            <div class="bg-white rounded-[2rem] p-7 report-card">
+                <div class="flex justify-between items-start">
+                    <div class="w-12 h-12 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center">
+                        <i data-lucide="trending-up" class="w-6 h-6"></i>
+                    </div>
+                </div>
+                <div class="mt-5">
+                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Growth Rate</p>
+                    <h3 class="text-2xl font-[800] mt-1">12.5%</h3>
+                </div>
+            </div>
+        </section>
+
+        <!-- DATA TABLE -->
+        <div class="table-container bg-white rounded-[2.5rem] overflow-hidden">
+            <div class="px-10 py-8 border-b border-gray-50 flex justify-between items-center">
+                <div>
+                    <h2 class="text-lg font-[800] text-[#062621] uppercase tracking-tight">Sales Analytics</h2>
+                    <p class="text-xs text-gray-400 font-medium">Breakdown of recent financial transactions.</p>
+                </div>
+                <div class="flex gap-2">
+                    <button class="p-3 bg-gray-50 rounded-xl text-[#062621] hover:bg-gray-100 transition"><i data-lucide="filter" class="w-4 h-4"></i></button>
+                    <button id="exportCsvBtn" class="bg-emerald-50 text-emerald-700 px-5 py-2.5 rounded-xl font-bold text-[10px] uppercase tracking-widest border border-emerald-100 hover:bg-emerald-100 transition">Export CSV</button>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-[#062621] text-white/50 text-[10px] uppercase tracking-[0.25em]">
+                        <tr>
+                            <th class="px-10 py-6 font-bold">Transaction ID</th>
+                            <th class="px-10 py-6 font-bold">Date</th>
+                            <th class="px-10 py-6 font-bold">Client</th>
+                            <th class="px-10 py-6 font-bold">Amount</th>
+                            <th class="px-10 py-6 font-bold text-right">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reportTableBody" class="divide-y divide-gray-50 text-sm font-medium">
+                       
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="../../js/reports.js"></script>
+<script>
+    // SIDEBAR INJECTION
+    fetch('/frontend/admin/includes/sidebar-admin.html')
+        .then(res => res.text())
+        .then(data => {
+            document.getElementById('sidebar-container').innerHTML = data;
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+
+            
+            const currentPath = window.location.pathname;
+            document.querySelectorAll('[data-nav-link]').forEach(link => {
+                if (currentPath.includes(link.getAttribute('href'))) {
+                    
+                    link.classList.add('bg-[#10b981]', 'shadow-xl');
+                    
+                    
+                    link.classList.remove('text-white/70', 'text-white');
+                    link.classList.add('text-[#062621]', 'font-bold');
+                    
+                    
+                    const icon = link.querySelector('i');
+                    if (icon) {
+                        icon.setAttribute('stroke', '#062621');
+                    }
+                }
+            });
+        });
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadDashboardData();
+    loadLowStockNotices();
+});
+</script>
+</body>
+</html>

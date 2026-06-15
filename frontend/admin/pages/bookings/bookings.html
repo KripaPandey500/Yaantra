@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../../../assets/css/custom.css">
+    <link rel="stylesheet" href="../../../assets/css/tailwind.css">
+</head>
+<body class="bg-gray-100">
+
+<script>
+    const token = localStorage.getItem('token');
+    const userRole = localStorage.getItem('userRole');
+    if (!token || userRole !== 'Admin') {
+        window.location.href = '/frontend/auth/login.html?message=Login First';
+    }
+</script>
+
+<div id="sidebar-container"></div>
+
+<div class="ml-72 min-h-screen">
+    <div class="relative w-full">
+        <header class="shadow px-8 py-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4 w-full z-30 sticky top-0" style="background-color: var(--color-primary); left:0;">
+            <div class="w-full flex flex-col items-center md:items-start justify-center">
+                <h1 class="text-2xl font-bold text-white mb-1 w-full text-center md:text-left">Booking Management</h1>
+            </div>
+        </header>
+    </div>
+
+    <div class="p-6 space-y-6">
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+            <div class="p-4 border-b">
+                <input id="searchInput"
+                    type="text"
+                    placeholder="Search customer, vehicle, service..."
+                    class="w-full border px-3 py-2 rounded text-sm" />
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full min-w-[1000px]">
+                    <thead class="bg-[#23412a] text-white">
+                        <tr>
+                            <th class="p-3 text-left">S.N</th>
+                            <th class="p-3 text-left">Customer</th>
+                            <th class="p-3 text-left">Vehicle</th>
+                            <th class="p-3 text-left">Service</th>
+                            <th class="p-3 text-left">Booking Date</th>
+                            <th class="p-3 text-left">Status</th>
+                            <th class="p-3 text-left">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bookingTable"></tbody>
+                </table>
+            </div>
+
+            <div class="flex justify-center items-center gap-2 p-5 border-t">
+                <button id="prevBtn"
+                    type="button"
+                    class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600">
+                    ←
+                </button>
+                <div id="paginationNumbers" class="flex gap-2"></div>
+                <button id="nextBtn"
+                    type="button"
+                    class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600">
+                    →
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reviews Modal -->
+<div id="reviewsModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-96 flex flex-col relative">
+        <button onclick="closeReviewsModal()" class="absolute top-4 right-5 text-gray-500 hover:text-gray-800 text-2xl font-bold">&times;</button>
+        <div class="p-6 border-b text-center">
+            <h2 class="text-2xl font-bold text-gray-900 uppercase tracking-wide">Customer Reviews</h2>
+        </div>
+        <input type="hidden" id="reviewsBookingId">
+        <div id="reviewsList" class="flex-1 overflow-y-auto p-6 space-y-4">
+            <p class="text-sm text-gray-500 text-center py-8">Loading reviews...</p>
+        </div>
+    </div>
+</div>
+
+<script src="../../js/bookings.js"></script>
+<script>
+function initAdminSidebar(container) {
+    if (!container) return;
+    const currentPath = window.location.pathname.replace(/\/+$/, '');
+    container.querySelectorAll('[data-nav-link]').forEach((link) => {
+        const linkPath = new URL(link.href, window.location.origin).pathname.replace(/\/+$/, '');
+        if (linkPath === currentPath) {
+            link.classList.add('bg-[#1f6b58]', 'border-l-white', 'font-bold');
+        }
+    });
+}
+
+fetch('/frontend/admin/includes/sidebar-admin.html')
+    .then(res => res.text())
+    .then(data => {
+        const sc = document.getElementById('sidebar-container');
+        sc.innerHTML = data;
+        initAdminSidebar(sc);
+    });
+</script>
+</body>
+</html>

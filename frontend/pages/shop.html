@@ -1,0 +1,75 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YAANTRA - Shop All Products</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/custom.css">
+<link rel="stylesheet" href="../assets/css/tailwind.css">
+
+</head>
+<body class="min-h-screen flex flex-col bg-[var(--color-secondary)] text-gray-900 [font-family:'Sora',sans-serif]">
+<div id="storefront-header-container"></div>
+<!-- MAIN -->
+<main class="flex-grow pt-[165px] md:pt-[255px] lg:pt-[210px] pb-16">
+<section class="py-12 bg-[var(--color-light)] ">
+<div class="container mx-auto px-6">
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
+<aside class="lg:col-span-1 bg-[var(--color-secondary)] border border-[#e8ebe9] rounded-2xl p-5 lg:sticky lg:top-28 min-h-[74vh] max-h-[calc(100vh-8rem)] overflow-y-auto shadow-sm">
+<div class="mb-4 border-b border-[#dce4e1] pb-3">
+<h2 class="text-lg font-bold text-[var(--color-primary)]">Filters</h2>
+</div>
+
+<div class="space-y-4">
+<div class="rounded-xl border border-[#dce4e1] bg-white p-3">
+<label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">Categories</label>
+<div id="filter-category-list" class="flex flex-col gap-2 max-h-48 overflow-y-auto pr-1">
+	<span class="text-gray-500 text-sm">Loading categories...</span>
+</div>
+</div>
+
+<div class="rounded-xl border border-[#dce4e1] bg-white p-3">
+<label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">Price Range (Rs.)</label>
+<div class="grid grid-cols-2 gap-2">
+<input id="filter-min-price" type="number" min="0" placeholder="Min" class="w-full rounded-lg border border-[#d9dfdc] px-3 py-2 text-sm bg-[#fcfdfd] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] transition">
+<input id="filter-max-price" type="number" min="0" placeholder="Max" class="w-full rounded-lg border border-[#d9dfdc] px-3 py-2 text-sm bg-[#fcfdfd] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] transition">
+</div>
+</div>
+
+<button id="filter-reset" type="button" class="w-full btn btn-secondary py-2.5 rounded-lg text-sm">Reset Filters</button>
+</div>
+</aside>
+
+<div class="lg:col-span-3">
+<div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8">
+<p id="loading-message" class="col-span-full text-center text-gray-500 italic">Loading products...</p>
+<p id="error-message" class="col-span-full text-center text-red-500 hidden">Failed to load products. Please try again later.</p>
+</div>
+<div id="shop-pagination" class="flex justify-center items-center gap-2 p-5 border-t mt-6 hidden">
+<button id="shop-prev-btn" type="button" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed">
+&larr;
+</button>
+<div id="shop-pagination-numbers" class="flex gap-2"></div>
+<button id="shop-next-btn" type="button" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed">
+&rarr;
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<div id="storefront-footer-container"></div>
+<div id="toast" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a1a1a;color:#fff;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:500;z-index:9999;transition:all 0.3s ease;opacity:0;pointer-events:none;white-space:nowrap;">
+</div>
+<script src="../assets/js/jwt-decode.js"></script>
+<script src="../assets/js/homepage.js"></script>
+<script src="../assets/js/shop.js"></script>
+</body>
+</html>
+
+
+
+

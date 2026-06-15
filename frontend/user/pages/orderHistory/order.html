@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order History | Yaantra User</title>
+    
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="/frontend/assets/css/custom.css">
+    <link rel="stylesheet" href="/frontend/assets/css/tailwind.css">
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            letter-spacing: -0.02em;
+            background-color: #f8faf9;
+        }
+        .ts-alert-success { background-color: #ecfdf5; color: #065f46; border: 1px solid #10b981; padding: 1rem; border-radius: 1rem; font-weight: 700; }
+        .ts-alert-error { background-color: #fef2f2; color: #991b1b; border: 1px solid #ef4444; padding: 1rem; border-radius: 1rem; font-weight: 700; }
+        
+        .table-container {
+            border: 1px solid rgba(16, 185, 129, 0.2); /* Emerald border 20% opacity */
+            box-shadow: 0 20px 25px -5px rgba(6, 38, 33, 0.05);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen text-[#062621]">
+<script>
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = '/frontend/auth/login.html?message=Login First';
+    }
+    
+    // Global logout functions
+    window.showLogoutModal = function() { 
+        const modal = document.getElementById('logoutModal');
+        if (modal) modal.classList.remove('hidden'); 
+    }
+    window.closeLogoutModal = function() { 
+        const modal = document.getElementById('logoutModal');
+        if (modal) modal.classList.add('hidden'); 
+    }
+    window.logout = function() {
+        localStorage.removeItem('token');
+        localStorage.removeItem('userEmail');
+        localStorage.removeItem('firstName');
+        localStorage.removeItem('lastName');
+        localStorage.removeItem('userRole');
+        localStorage.removeItem('profilePic');
+        window.location.href = '/frontend/auth/login.html';
+    }
+</script>
+
+<div id="sidebar-container"></div>
+
+<div class="md:ml-64 min-h-screen transition-all duration-300">
+    
+    <!-- TOP HEADER -->
+    <header class="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-100 px-8 py-5 flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-extrabold text-[#062621] tracking-tighter uppercase">Order History</h1>
+            <p class="text-[10px] text-gray-400 font-bold tracking-widest uppercase opacity-70 mt-1">View Your Orders & Purchases</p>
+        </div>
+    </header>
+
+    <div class="p-8 space-y-8 max-w-[1600px] mx-auto">
+        
+        <!-- SEARCH BAR -->
+        <div class="relative group">
+            <i data-lucide="search" class="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300 group-focus-within:text-emerald-500 transition"></i>
+            <input id="searchInput" type="text" placeholder="Search order number or date..." 
+                class="w-full bg-white border-none shadow-sm rounded-2xl py-5 pl-14 pr-6 focus:ring-2 focus:ring-emerald-500/20 outline-none font-medium text-sm transition">
+        </div>
+
+        <div id="alertBox" class="hidden"></div>
+
+        <!-- ORDER TABLE with Emerald border -->
+        <div class="table-container bg-white rounded-[2.5rem] overflow-hidden">
+            <div class="px-8 py-6 flex items-center justify-between border-b border-gray-50">
+                <h2 class="text-base font-bold text-[#062621] uppercase tracking-tight">Recent Orders</h2>
+                <button onclick="loadOrders(1)" class="text-gray-400 hover:text-emerald-500 transition">
+                    <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-[#062621] text-white/50 text-[10px] uppercase tracking-[0.2em]">
+                        <tr>
+                            <th class="px-8 py-5 font-bold">S.N</th>
+                            <th class="px-8 py-5 font-bold">Order No</th>
+                            <th class="px-8 py-5 font-bold">Date</th>
+                            <th class="px-8 py-5 font-bold">Status</th>
+                            <th class="px-8 py-5 font-bold text-center">Items</th>
+                            <th class="px-8 py-5 font-bold text-right">Grand Total</th>
+                            <th class="px-8 py-5 font-bold text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orderTable" class="divide-y divide-gray-50 text-sm">
+                        <!-- Populated by order.js -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- PAGINATION -->
+            <div class="flex justify-center items-center px-10 py-6 bg-gray-50/50">
+                <button id="prevBtn" onclick="prevPage()" class="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-gray-100 hover:bg-emerald-50 transition text-gray-400 disabled:opacity-30">
+                    <i data-lucide="chevron-left" class="w-5 h-5"></i>
+                </button>
+                <div id="paginationNumbers" class="flex gap-2"></div>
+                <button id="nextBtn" onclick="nextPage()" class="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-gray-100 hover:bg-emerald-50 transition text-gray-400 disabled:opacity-30">
+                    <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CANCEL ORDER MODAL -->
+<div id="cancelOrderModal" class="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 backdrop-blur-sm hidden p-4">
+    <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-sm p-10 text-center">
+        <div class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
+            <i data-lucide="x-circle" class="w-8 h-8"></i>
+        </div>
+        <h2 class="text-xl font-extrabold text-[#062621]">Cancel Order?</h2>
+        <p class="text-gray-400 text-sm mt-2 mb-8"> Are you sure you want to cancel this order?.</p>
+        <div class="flex gap-3">
+            <button onclick="closeCancelOrderModal()" class="flex-1 py-4 bg-gray-100 text-gray-400 rounded-2xl font-bold text-[10px] uppercase">No</button>
+            <button id="confirmCancelBtn" class="flex-1 py-4 bg-red-600 text-white rounded-2xl font-bold text-[10px] uppercase shadow-lg shadow-red-200">Cancel Order</button>
+        </div>
+    </div>
+</div>
+
+<template id="orderRowTemplate">
+    <tr class="border-b hover:bg-gray-50 align-top transition">
+        <td class="px-8 py-5 order-sn font-medium"></td>
+        <td class="px-8 py-5 order-number font-bold text-emerald-600"></td>
+        <td class="px-8 py-5 order-date text-gray-600"></td>
+        <td class="px-8 py-5">
+            <span class="order-status px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wide"></span>
+        </td>
+        <td class="px-8 py-5 text-center order-item-count font-medium"></td>
+        <td class="px-8 py-5 text-right order-grand-total font-bold text-emerald-600"></td>
+        <td class="px-8 py-5 text-right space-x-2 flex justify-end gap-3">
+            <a class="order-view-link text-slate-700 hover:text-slate-900 transition">
+                <i data-lucide="eye" class="w-5 h-5"></i>
+            </a>
+            <button type="button" class="order-cancel-btn px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg font-semibold text-[11px] uppercase transition hidden">
+                Cancel
+            </button>
+        </td>
+    </tr>
+</template>
+
+<template id="orderEmptyRowTemplate">
+    <tr class="border-b">
+        <td class="px-8 py-6 text-center text-sm text-gray-400 font-medium" colspan="7">No orders found.</td>
+    </tr>
+</template>
+
+<script src="../../../assets/js/alert.js"></script>
+<script src="../../js/order.js"></script>
+<script>
+    // Initialize sidebar
+    function initUserSidebar(container) {
+        if (!container) return;
+        const currentPath = window.location.pathname.replace(/\/+$/, '');
+        container.querySelectorAll('[data-nav-link]').forEach((link) => {
+            const linkPath = new URL(link.href, window.location.origin).pathname.replace(/\/+$/, '');
+            if (linkPath === currentPath) {
+                link.classList.add('bg-emerald-600', 'shadow-lg', 'text-white', 'font-semibold');
+                link.classList.remove('text-white/60', 'hover:bg-white/10');
+            }
+        });
+    }
+
+    fetch('/frontend/user/includes/sidebar-user.html')
+        .then(res => res.text())
+        .then(data => {
+            document.getElementById('sidebar-container').innerHTML = data;
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+            initUserSidebar(document.getElementById('sidebar-container'));
+        });
+
+    function closeDeleteOrderModal() { 
+        document.getElementById('deleteOrderModal').classList.add('hidden'); 
+    }
+
+    window.addEventListener('load', () => {
+        loadOrders(1);
+    });
+</script>
+</body>
+</html>

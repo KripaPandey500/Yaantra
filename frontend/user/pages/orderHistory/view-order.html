@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Order | Yaantra User</title>
+    
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="/frontend/assets/css/custom.css">
+    <link rel="stylesheet" href="/frontend/assets/css/tailwind.css">
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            letter-spacing: -0.02em;
+            background-color: #f8faf9;
+        }
+        .ts-alert-success { background-color: #ecfdf5; color: #065f46; border: 1px solid #10b981; padding: 1rem; border-radius: 1rem; font-weight: 700; }
+        .ts-alert-error { background-color: #fef2f2; color: #991b1b; border: 1px solid #ef4444; padding: 1rem; border-radius: 1rem; font-weight: 700; }
+        
+        
+        .table-container {
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            box-shadow: 0 20px 25px -5px rgba(6, 38, 33, 0.05);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen text-[#062621]">
+<script>
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = '/frontend/auth/login.html?message=Login First';
+    }
+    
+    // Global logout functions
+    window.showLogoutModal = function() { 
+        const modal = document.getElementById('logoutModal');
+        if (modal) modal.classList.remove('hidden'); 
+    }
+    window.closeLogoutModal = function() { 
+        const modal = document.getElementById('logoutModal');
+        if (modal) modal.classList.add('hidden'); 
+    }
+    window.logout = function() {
+        localStorage.removeItem('token');
+        localStorage.removeItem('userEmail');
+        localStorage.removeItem('firstName');
+        localStorage.removeItem('lastName');
+        localStorage.removeItem('userRole');
+        localStorage.removeItem('profilePic');
+        window.location.href = '/frontend/auth/login.html';
+    }
+</script>
+
+<div id="sidebar-container"></div>
+
+<div class="md:ml-64 min-h-screen transition-all duration-300">
+    
+    <!-- TOP HEADER -->
+    <header class="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-100 px-8 py-5 flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-extrabold text-[#062621] tracking-tighter uppercase">Order Details</h1>
+            <p class="text-[10px] text-gray-400 font-bold tracking-widest uppercase opacity-70 mt-1">Review Your Order Information</p>
+        </div>
+        <a href="order.html" class="bg-[#062621] text-white px-6 py-3 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] transition hover:opacity-95 shadow-xl shadow-emerald-950/10 flex items-center gap-2">
+            <i data-lucide="arrow-left" class="w-5 h-5"></i>
+            <span>Back to Orders</span>
+        </a>
+    </header>
+
+    <div class="p-8 space-y-8 max-w-[1400px] mx-auto">
+        <div id="alertBox" class="hidden"></div>
+        
+        <div id="viewOrderContent" class="space-y-6">
+            <p id="orderDetailLoading" class="text-center text-gray-500 py-8">Loading order details...</p>
+            <p id="orderDetailError" class="hidden text-center text-red-600 py-8"></p>
+
+            <div id="orderDetailLayout" class="hidden space-y-6">
+                <!-- ORDER HEADER DETAILS -->
+                <div class="table-container bg-white rounded-[2.5rem] overflow-hidden">
+                    <div class="px-8 py-6 border-b border-gray-50">
+                        <h2 class="text-base font-bold text-[#062621] uppercase tracking-tight">Order Summary</h2>
+                    </div>
+                    
+                    <div class="px-8 py-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="space-y-2">
+                            <p class="text-[9px] font-black text-gray-400 uppercase tracking-[0.15em]">Order Number</p>
+                            <p id="detailOrderNumber" class="text-base font-bold text-[#062621]">-</p>
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-[9px] font-black text-gray-400 uppercase tracking-[0.15em]">Order Date</p>
+                            <p id="detailOrderDate" class="text-base font-bold text-[#062621]">-</p>
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-[9px] font-black text-gray-400 uppercase tracking-[0.15em]">Status</p>
+                            <p id="detailStatus" class="text-base font-bold text-[#062621]">-</p>
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-[9px] font-black text-gray-400 uppercase tracking-[0.15em]">Payment Status</p>
+                            <p id="detailPaymentStatus" class="text-base font-bold text-[#062621]">-</p>
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-[9px] font-black text-gray-400 uppercase tracking-[0.15em]">Payment Method</p>
+                            <p id="detailPaymentMethod" class="text-base font-bold text-[#062621]">-</p>
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-[9px] font-black text-gray-400 uppercase tracking-[0.15em]">Shipping Address</p>
+                            <p id="detailShippingAddress" class="text-base font-bold text-[#062621]">-</p>
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-[9px] font-black text-gray-400 uppercase tracking-[0.15em]">Total Amount</p>
+                            <p id="detailTotalAmount" class="text-lg font-black text-emerald-600">Rs. 0.00</p>
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-[9px] font-black text-gray-400 uppercase tracking-[0.15em]">Discount</p>
+                            <p id="detailDiscountAmount" class="text-base font-bold text-[#062621]">Rs. 0.00</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ORDERED ITEMS TABLE -->
+                <div class="table-container bg-white rounded-[2.5rem] overflow-hidden">
+                    <div class="px-8 py-6 flex items-center justify-between border-b border-gray-50">
+                        <h2 class="text-base font-bold text-[#062621] uppercase tracking-tight">Order Items</h2>
+                        <p class="text-sm font-bold text-emerald-600">Grand Total: <span id="detailGrandTotal">Rs. 0.00</span></p>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-[#062621] text-white/50 text-[10px] uppercase tracking-[0.2em]">
+                                <tr>
+                                    <th class="px-8 py-5 font-bold">Product</th>
+                                    <th class="px-8 py-5 font-bold">Quantity</th>
+                                    <th class="px-8 py-5 font-bold">Unit Price</th>
+                                    <th class="px-8 py-5 font-bold">Discount</th>
+                                    <th class="px-8 py-5 font-bold text-right">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orderItemsTableBody" class="divide-y divide-gray-50 text-sm"></tbody>
+                        </table>
+                    </div>
+                    <p id="orderItemsEmpty" class="hidden text-sm text-gray-500 py-8 text-center">No order items found.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="../../../assets/js/alert.js"></script>
+<script src="../../js/order.js"></script>
+<script>
+function initUserSidebar(container) {
+    if (!container) return;
+    const currentPath = window.location.pathname.replace(/\/+$/, '');
+    container.querySelectorAll('[data-nav-link]').forEach((link) => {
+        const linkPath = new URL(link.href, window.location.origin).pathname.replace(/\/+$/, '');
+        if (linkPath === currentPath) {
+            link.classList.add('bg-emerald-600', 'shadow-lg', 'text-white', 'font-semibold');
+            link.classList.remove('text-white/60', 'hover:bg-white/10');
+        }
+    });
+}
+
+fetch('/frontend/user/includes/sidebar-user.html')
+    .then(res => res.text())
+    .then(data => {
+        const sidebarContainer = document.getElementById('sidebar-container');
+        sidebarContainer.innerHTML = data;
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+        initUserSidebar(sidebarContainer);
+    });
+</script>
+</body>
+</html>
